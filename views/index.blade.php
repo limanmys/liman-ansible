@@ -18,13 +18,9 @@
 </ul>
 
 <div class="tab-content">
-
-    <div id="hosts" class="tab-pane active">
-    </div>
-
+    @include('hosts')    
     <div id="users" class="tab-pane">
     </div>
-
 </div>
 
 
@@ -36,11 +32,13 @@
     
     function getHosts(){
         var form = new FormData();
+        showSwal('{{__("Yükleniyor...")}}','info');
         request("{{API('getHosts')}}", form, function(response) {
-            message = JSON.parse(response)["message"];
-            $('#hosts').html(message);
+            $('#hosts').html(response);
+            Swal.close();
         }, function(error) {
             $('#hosts').html("Hata oluştu");
+            Swal.close();
         });
     }
 
