@@ -1,6 +1,7 @@
 <?php
 
-    $filepath = "/etc/ansible/hosts";
+    $hostsfilepath = "/etc/ansible/hosts";
+    $userfilepath = "/etc/ansible/users";
 
     function index(){
         return view('index');
@@ -10,9 +11,29 @@
         return view('install');
     }
 
+    function getUsers(){
+        global $userfilepath;
+
+        $textJson = str_replace("\n","",runCommand("cat $userfilepath"));
+        $textJson = substr($textJson, 0, -1);
+        $arrayJson = json_decode("[".$textJson."]",true);
+        if(!is_array($arrayJson)){
+            return respond("error",201);
+        }
+        return view('table', [
+            "value" => $arrayJson,
+            "title" => [
+                "İsim","Password","Sudo Yetkisi"
+            ],
+            "display" => [
+                "name","password","sudo"
+            ],
+        ]);
+    }
+
     function getHosts(){
-        global $filepath;
-        $output = trim(runCommand("cat $filepath | grep -v '^#'")) . " [";
+        global $hostsfilepath;
+        $output = trim(runCommand("cat $hostsfilepath | grep -v '^#'")) . " [";
         $output = str_replace("\n"," ",$output);
         preg_match_all('/\[.*?(?=\[)/',$output, $matches);
         $data = [];
@@ -32,8 +53,6 @@
             array_push($data,$item);
         }
         return view('hosts', ['data' => $data]);
-
-        //return respond($allitem,200);
     }
     
     function installAnsiblePackage()

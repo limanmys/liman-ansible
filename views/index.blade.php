@@ -20,6 +20,7 @@
 <div class="tab-content">
     @include('hosts')    
     <div id="users" class="tab-pane">
+        <div class="table-responsive usersTable"></div> 
     </div>
 </div>
 
@@ -29,7 +30,26 @@
     if(location.hash === ""){
         getHosts();
     }
-    
+
+    function getUsers(){
+        var form = new FormData();
+        showSwal('{{__("Yükleniyor...")}}','info');
+        request("{{API('getUsers')}}", form, function(response) {
+
+            $('.usersTable').html(response).find('table').DataTable({
+                bFilter: true,
+                "language" : {
+                    url : "/turkce.json"
+                }
+            }); 
+            $('td#password').css('-webkit-text-security', 'disc'); 
+            Swal.close();
+        }, function(error) {
+            $('#users').html("<div class='alert alert-danger '><h5><i class='fas fa-exclamation-triangle'></i> Hata !</h5>Hata Oluştu. Yetkili ile iletişime geçiniz</div>");
+            Swal.close();
+        });
+    }
+
     function getHosts(){
         var form = new FormData();
         showSwal('{{__("Yükleniyor...")}}','info');
