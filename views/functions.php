@@ -11,9 +11,37 @@
         return view('install');
     }
 
+    function addUser(){
+        global $userfilepath;
+        $username = request("username");
+        $password = request("password");
+        $permission = request("type");
+        $textJson = str_replace("\n","",runCommand("cat $userfilepath"));
+        $textJson = substr($textJson, 0, -1);
+        $arrayJson = json_decode("[".$textJson."]",true);
+
+        foreach ($arrayJson as $key => $value) {
+            if($value["name"] == trim($username) && $value["password"] == trim($password)){
+                return respond("Aynı kullanıcı bulunmaktadır",201);
+            }
+        }
+        $item = array(
+            "name" => $username,
+            "password" => $password,
+            "sudo" => $permission
+        );
+        $text = json_encode($item);
+        $text = str_replace("\"","\\\"",$text);
+        $output = runCommand(sudo()."sh -c 'echo $text, >> /etc/ansible/users'");
+        if(trim($output) == ""){
+            return respond("Başarıyla Eklendi",200);
+        }else{
+            return respond($output,201);
+        }
+    }
+
     function getUsers(){
         global $userfilepath;
-
         $textJson = str_replace("\n","",runCommand("cat $userfilepath"));
         $textJson = substr($textJson, 0, -1);
         $arrayJson = json_decode("[".$textJson."]",true);

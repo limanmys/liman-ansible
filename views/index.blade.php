@@ -20,8 +20,35 @@
 <div class="tab-content">
     @include('hosts')    
     <div id="users" class="tab-pane">
+        
+        @include('modal-button',[
+            "class"     =>  "btn btn-outline-primary",
+            "target_id" =>  "addUserModal",
+            "text"      =>  "Kullanıcı Ekle",
+            "icon" => "fas fa-plus"
+        ])<br><br>
         <div class="table-responsive usersTable"></div> 
+        @include('modal',[
+            "id"=>"addUserModal",
+            "title" => "Kullanıcı Ekleme",
+            "url" => API('addUser'),
+            "next" => "reload",
+            "inputs" => [
+                "Kullanıcı Adı" => "username:text:Kullanıcı Adı",
+                "Şifre" => "password:password:Şifrenizi Giriniz",
+            ],
+            "selects" => [
+                "Var:Var" => [
+                    "True:True" => "type:hidden",
+                ],
+                "Yok:Yok" => [
+                    "False:False" => "type:hidden",
+                ],
+            ],
+            "submit_text" => "Ekle"
+            ])<br><br>
     </div>
+
 </div>
 
 
