@@ -29,7 +29,7 @@
                             </div>
                         </div>
                         <div class="card-footer bg-white ">
-                            <button class="btn btn-primary " onclick=""><i class='far fa-eye'></i>  {{__("İp Ekle")}}</button>
+                            <button class="btn btn-primary " onclick="addClientIpJS('{{$source['name']}}')"><i class='fas fa-plus'></i>  {{__("İp Ekle")}}</button>
                         </div>
                     </div>
                 </div>
@@ -37,3 +37,21 @@
         @endif
     </div>
 </div>
+@include('modal',[
+    "id"=>"addClientIpModal",
+    "title" => "Client Ip Ekleme",
+    "url" => API('addClientIp'),
+    "next" => "reload",
+    "inputs" => [
+        "hostsname:hostname" => "hostsname:hidden",
+        "Ip Adresi" => "ipaddress:text:Ip Adresi (Örn : 172.0.0.1)",
+    ],
+    "submit_text" => "Ekle"
+])<br><br>
+
+<script>
+    function addClientIpJS(name){
+        $('[name=hostsname]').val(name);
+        $("#addClientIpModal").modal("show");
+    }
+</script>

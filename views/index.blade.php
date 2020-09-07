@@ -18,7 +18,8 @@
 </ul>
 
 <div class="tab-content">
-    @include('hosts')    
+    @include('hosts')  
+      
     <div id="users" class="tab-pane">
         
         @include('modal-button',[

@@ -11,6 +11,24 @@
         return view('install');
     }
 
+    function addClientIp(){
+        global $hostsfilepath;
+        $hostsname = trim(request("hostsname"));
+        $ipaddress = request("ipaddress");
+        $output = trim(runCommand("cat $hostsfilepath | grep -v '^#'")) . " [";
+        $output = str_replace("\n"," ",$output);
+        preg_match("/\[$hostsname\](.*?)(?=\[)/",$output,$hostzone);
+        if(strpos($hostzone[1],trim($ipaddress)) !== FALSE){
+            return respond("Ip adresi bulunmaktadır",201);
+        }
+        $output = runCommand(sudo()."sh -c \"sed -i '/\[$hostsname\]/a $ipaddress' /etc/ansible/hosts\"");
+        if(trim($output) == ""){
+            return respond("Başarıyla Eklendi",200);
+        }else{
+            return respond($output,201);
+        }
+    }
+
     function addUser(){
         global $userfilepath;
         $username = request("username");
