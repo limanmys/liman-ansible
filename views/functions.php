@@ -11,6 +11,20 @@
         return view('install');
     }
 
+    function deleteClientIp(){
+        global $hostsfilepath;
+        $hostsname = trim(request("deletehostsname"));
+        $ipaddress = request("ipaddress");
+        $linenumber = trim(runCommand("cat -n $hostsfilepath | sed -n -e '/\[$hostsname/,/\[/ p' | grep '$ipaddress' | awk '{print $1}'"));
+        $output = runCommand(sudo()."sh -c \"sed -i '$linenumber d' $hostsfilepath\"");
+
+        if(trim($output) == ""){
+            return respond("Başarıyla Silindi",200);
+        }else{
+            return respond($output,201);
+        }
+    }
+
     function addClientIp(){
         global $hostsfilepath;
         $hostsname = trim(request("hostsname"));
@@ -21,7 +35,7 @@
         if(strpos($hostzone[1],trim($ipaddress)) !== FALSE){
             return respond("Ip adresi bulunmaktadır",201);
         }
-        $output = runCommand(sudo()."sh -c \"sed -i '/\[$hostsname\]/a $ipaddress' /etc/ansible/hosts\"");
+        $output = runCommand(sudo()."sh -c \"sed -i '/\[$hostsname\]/a $ipaddress' $hostsfilepath\"");
         if(trim($output) == ""){
             return respond("Başarıyla Eklendi",200);
         }else{

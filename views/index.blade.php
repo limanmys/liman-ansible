@@ -21,7 +21,6 @@
     @include('hosts')  
       
     <div id="users" class="tab-pane">
-        
         @include('modal-button',[
             "class"     =>  "btn btn-outline-primary",
             "target_id" =>  "addUserModal",

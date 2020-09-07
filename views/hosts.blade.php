@@ -21,7 +21,8 @@
                                 <div id="{{$source["name"]}}Size" class="panel-collapse in collapse" style="">
                                     <div class="card-body">
                                         @foreach ($source["ip"] as $ip)
-                                            {{$ip}}<br>
+                                            {{$ip}} &nbsp;&nbsp;   <button class="btn btn-danger btn-xs" onclick="deleteClientIpJS('{{$source['name']}}','{{$ip}}')">x</button>
+                                        <br>
                                         @endforeach
                                     </div>
                                 </div>
@@ -47,11 +48,30 @@
         "Ip Adresi" => "ipaddress:text:Ip Adresi (Örn : 172.0.0.1)",
     ],
     "submit_text" => "Ekle"
-])<br><br>
+])
+
+@include('modal',[
+    "id"=>"deleteClientIpModal",
+    "title" => "Client Ip Silme",
+    "url" => API('deleteClientIp'),
+    "next" => "reload",
+    "text" => "Bu işlem geri alınamaz. Silmek istediğinize emin misiniz ?",
+    "inputs" => [
+        "deletehostsname:deletehostsname" => "deletehostsname:hidden",
+        "ipaddress:ipaddress" => "ipaddress:hidden",
+    ],
+    "submit_text" => "Sil"
+])
+
 
 <script>
     function addClientIpJS(name){
         $('[name=hostsname]').val(name);
         $("#addClientIpModal").modal("show");
+    }
+    function deleteClientIpJS(name,ipaddress){
+        $('[name=deletehostsname]').val(name);
+        $('[name=ipaddress]').val(ipaddress);
+        $("#deleteClientIpModal").modal("show");
     }
 </script>
