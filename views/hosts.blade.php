@@ -20,7 +20,15 @@
     ])
 
     <div class="row" style="margin-top: 10px;">
+
         @if(is_array($data))
+            @if(empty($data))
+                <div class="alert alert-info alert-dismissible col-md-12">
+                    <h5><i class="icon fas fa-info"></i> Bilgi !</h5>
+                        Grup Bulunmamaktadır
+                </div>
+            <?php exit(); ?>
+            @endif
             @foreach($data as $source)
             
             <div class="col-md-6 ">
@@ -34,14 +42,17 @@
                                 <div class="card-header">
                                     <h4 class="card-title">
                                     <a data-toggle="collapse" data-parent="#accordion" href="#{{$source["name"]}}Size" class="collapsed" aria-expanded="false">
-                                        İp Adresleri
+                                        Client Adresleri
                                     </a>
                                     </h4>
                                 </div>
                                 <div id="{{$source["name"]}}Size" class="panel-collapse in collapse" style="">
                                     <div class="card-body">
                                         @foreach ($source["ip"] as $ip)
-                                            {{$ip}} &nbsp;&nbsp;   <button class="btn btn-danger btn-xs" onclick="deleteClientIpJS('{{$source['name']}}','{{$ip}}')">x</button>
+                                            {{$ip}} &nbsp;&nbsp;   
+                                            @if(!strpos(trim($ip),'bulunmamaktadır') !== FALSE)
+                                                <button class="btn btn-danger btn-xs" onclick="deleteClientIpJS('{{$source['name']}}','{{$ip}}')">x</button>
+                                            @endif
                                         <br>
                                         @endforeach
                                     </div>

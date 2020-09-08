@@ -37,10 +37,13 @@
     function deleteClientIp(){
         global $hostsfilepath;
         $hostsname = trim(request("deletehostsname"));
-        $ipaddress = request("ipaddress");
-        $linenumber = trim(runCommand("cat -n $hostsfilepath | sed -n -e '/\[$hostsname/,/\[/ p' | grep '$ipaddress' | awk '{print $1}'"));
+        $ipaddress = trim(request("ipaddress"));
+        if($hostsname == "Grupsuz"){
+            $linenumber = trim(runCommand("cat $hostsfilepath | grep -n  -v '^#' | sed -n -e '/\[.*/,/\\$/!p'  | grep '$ipaddress' | cut -d ':' -f1"));
+        }else{
+            $linenumber = trim(runCommand("cat -n $hostsfilepath | sed -n -e '/\[$hostsname/,/\[/ p' | grep '$ipaddress' | awk '{print $1}'"));
+        }
         $output = runCommand(sudo()."sh -c \"sed -i '$linenumber d' $hostsfilepath\"");
-
         if(trim($output) == ""){
             return respond("Başarıyla Silindi",200);
         }else{
@@ -52,13 +55,23 @@
         global $hostsfilepath;
         $hostsname = trim(request("hostsname"));
         $ipaddress = request("ipaddress");
-        $output = trim(runCommand("cat $hostsfilepath | grep -v '^#'")) . " [";
-        $output = str_replace("\n"," ",$output);
-        preg_match("/\[$hostsname\](.*?)(?=\[)/",$output,$hostzone);
-        if(strpos($hostzone[1],trim($ipaddress)) !== FALSE){
-            return respond("Ip adresi bulunmaktadır",201);
+        if($hostsname == "Grupsuz"){
+            $grupsuz = trim(runCommand("cat $hostsfilepath | grep -v '^#' | sed -n -e '/\[.*/,/\\$/!p'"));
+            $grupsuz = explode("\n",$grupsuz);
+            if (in_array($ipaddress, $grupsuz)) {
+                return respond("Böyle bir client bulunmaktadır.",201);
+            }
+            $linenumber = runCommand("cat $hostsfilepath | grep -n -v '^#' | sed -n -e '/\[.*/,/\\$/!p' | tail -n 1 | cut -d ':' -f1");
+            $output = runCommand(sudo()."sh -c \"sed -i '$linenumber i $ipaddress' $hostsfilepath\"");
+        }else{
+            $output = trim(runCommand("cat $hostsfilepath | grep -v '^#'")) . " [";
+            $output = str_replace("\n"," ",$output);
+            preg_match("/\[$hostsname\](.*?)(?=\[)/",$output,$hostzone);
+            if(strpos($hostzone[1],trim($ipaddress)) !== FALSE){
+                return respond("Böyle bir client bulunmaktadır.",201);
+            }
+            $output = runCommand(sudo()."sh -c \"sed -i '/\[$hostsname\]/a $ipaddress' $hostsfilepath\"");
         }
-        $output = runCommand(sudo()."sh -c \"sed -i '/\[$hostsname\]/a $ipaddress' $hostsfilepath\"");
         if(trim($output) == ""){
             return respond("Başarıyla Eklendi",200);
         }else{
@@ -125,6 +138,8 @@
         global $hostsfilepath;
         $output = trim(runCommand("cat $hostsfilepath | grep -v '^#'")) . " [";
         $output = str_replace("\n"," ",$output);
+        //dd($output);
+
         preg_match_all('/\[.*?(?=\[)/',$output, $matches);
         $data = [];
 
@@ -132,17 +147,31 @@
             preg_match('/\[(.*)\]/',$value,$name);
             preg_match('/](.*)/',$value,$ip);
             $ips = [];
-            if(strpos(trim($ip[1]),' ') !== FALSE){
+            if(trim($ip[1]) == ""){
+                $ips[0] = "Client bulunmamaktadır";
+            }else if(strpos(trim($ip[1]),' ') !== FALSE){
                 $ips = explode(" ",trim($ip[1]));
+
             }else{
                 $ips[0] = $ip[1];
             }
+            $ips = array_filter($ips);  
             $item = array(
                 "name" => $name[1],
                 "ip" => $ips,
             );
             array_push($data,$item);
         }
+        
+        $grupsuz = trim(runCommand("cat $hostsfilepath | grep -v '^#' | sed -n -e '/\[.*/,/\\$/!p'"));
+        $grupsuz = explode("\n",$grupsuz);
+        $grupsuz = array_filter($grupsuz);  
+        $item = array(
+            "name" => "Grupsuz",
+            "ip" => $grupsuz
+        );
+        array_push($data,$item);
+
         return view('hosts', ['data' => $data]);
     }
     
