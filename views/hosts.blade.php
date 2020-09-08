@@ -1,4 +1,24 @@
 <div id="hosts" class="tab-pane active">
+
+    @include('modal-button',[
+        "class"     =>  "btn btn-outline-primary",
+        "target_id" =>  "addGroupModal",
+        "text"      =>  "Grup Ekle",
+        "icon" => "fas fa-plus"
+    ])<br><br>
+
+    @include('modal',[
+        "id"=>"addGroupModal",
+        "title" => "Grup Ekleme",
+        "url" => API('addGroup'),
+        "next" => "reload",
+        "inputs" => [
+            "Grup Adı" => "groupname:text:Grup Adı",
+            "Ip Adresi" => "ipaddress:text:Ip Adresi Giriniz",
+        ],
+        "submit_text" => "Ekle"
+    ])
+
     <div class="row" style="margin-top: 10px;">
         @if(is_array($data))
             @foreach($data as $source)

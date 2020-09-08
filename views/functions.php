@@ -11,6 +11,29 @@
         return view('install');
     }
 
+    function addGroup(){
+        global $hostsfilepath;
+        $groupname = trim(request("groupname"));
+        $ipaddress = request("ipaddress");
+        if (!filter_var(trim($ipaddress), FILTER_VALIDATE_IP)) {
+            return respond("Geçerli ip adresi giriniz",201);
+        } 
+        $text = "\n[$groupname]\n$ipaddress";
+        $allgroupnametext = trim(runCommand("cat $hostsfilepath | grep -v '^#'")) . " [";
+        $allgroupnametext = str_replace("\n"," ",$allgroupnametext);
+        preg_match_all("/\[(.*?)\]/",$allgroupnametext,$allgroupname);
+        if (in_array($groupname, $allgroupname[1])) {
+            return respond("Böyle bir grup bulunmaktadır.",201);
+        }
+        $output = runCommand(sudo()."sh -c 'echo \"$text\"  >> $hostsfilepath'");
+
+        if(trim($output) == ""){
+            return respond("Başarıyla Eklendi",200);
+        }else{
+            return respond($output,201);
+        }
+    }
+
     function deleteClientIp(){
         global $hostsfilepath;
         $hostsname = trim(request("deletehostsname"));
@@ -67,7 +90,7 @@
         );
         $text = json_encode($item);
         $text = str_replace("\"","\\\"",$text);
-        $output = runCommand(sudo()."sh -c 'echo $text, >> /etc/ansible/users'");
+        $output = runCommand(sudo()."sh -c 'echo $text, >> $userfilepath'");
         if(trim($output) == ""){
             return respond("Başarıyla Eklendi",200);
         }else{
@@ -104,10 +127,11 @@
         $output = str_replace("\n"," ",$output);
         preg_match_all('/\[.*?(?=\[)/',$output, $matches);
         $data = [];
+
         foreach ($matches[0] as $key => $value) {
             preg_match('/\[(.*)\]/',$value,$name);
             preg_match('/](.*)/',$value,$ip);
-
+            $ips = [];
             if(strpos(trim($ip[1]),' ') !== FALSE){
                 $ips = explode(" ",trim($ip[1]));
             }else{
