@@ -28,6 +28,7 @@
             "icon" => "fas fa-plus"
         ])<br><br>
         <div class="table-responsive usersTable"></div> 
+        <div class="messageAlert"></div> 
         @include('modal',[
             "id"=>"addUserModal",
             "title" => "Kullanıcı Ekleme",
@@ -72,7 +73,12 @@
             $('td#password').css('-webkit-text-security', 'disc'); 
             Swal.close();
         }, function(error) {
-            $('#users').html("<div class='alert alert-danger '><h5><i class='fas fa-exclamation-triangle'></i> Hata !</h5>Hata Oluştu. Yetkili ile iletişime geçiniz</div>");
+            status = JSON.parse(error)["status"];
+            if(status == 202){
+                $('.messageAlert').html("<div class='alert alert-info  '><h5><i class='fas fa-info'></i> Bilgi !</h5>Kullanıcı bulunmamaktadır</div>");
+            }else{
+                $('.messageAlert').html("<div class='alert alert-danger '><h5><i class='fas fa-exclamation-triangle'></i> Hata !</h5>Hata Oluştu. Yetkili ile iletişime geçiniz</div>");
+            }
             Swal.close();
         });
     }

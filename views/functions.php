@@ -48,6 +48,9 @@
         $username = request("username");
         $password = request("password");
         $permission = request("type");
+        if(runCommand(" [ -f $userfilepath ] 2>/dev/null 1>/dev/null && echo 1 || echo 0") == "0"){
+            runCommand(sudo()."touch $userfilepath");
+        }
         $textJson = str_replace("\n","",runCommand("cat $userfilepath"));
         $textJson = substr($textJson, 0, -1);
         $arrayJson = json_decode("[".$textJson."]",true);
@@ -74,6 +77,10 @@
 
     function getUsers(){
         global $userfilepath;
+        $arrayJson = [];
+        if(runCommand(" [ -f $userfilepath ] 2>/dev/null 1>/dev/null && echo 1 || echo 0") == "0"){
+            return respond("notfoundfile",202);
+        }
         $textJson = str_replace("\n","",runCommand("cat $userfilepath"));
         $textJson = substr($textJson, 0, -1);
         $arrayJson = json_decode("[".$textJson."]",true);
