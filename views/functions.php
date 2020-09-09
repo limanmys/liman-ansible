@@ -134,12 +134,25 @@
         ]);
     }
 
+    function getFileContent(){
+        $filepath = request("filepath");
+        $output = runCommand("cat $filepath");
+        return respond($output,200);
+    }
+
+    function getFiles(){
+        $output = runCommand("ls /opt/varlik");
+        if(runCommand(" [ -d /opt/varlik ] 2>/dev/null 1>/dev/null && echo 1 || echo 0") == "0" || trim($output) == ""){
+            return respond("notfoundfile",202);
+        }
+        $result = runScript("jstree.py","",true);
+        return respond($result,200);
+    }
+
     function getHosts(){
         global $hostsfilepath;
         $output = trim(runCommand("cat $hostsfilepath | grep -v '^#'")) . " [";
         $output = str_replace("\n"," ",$output);
-        //dd($output);
-
         preg_match_all('/\[.*?(?=\[)/',$output, $matches);
         $data = [];
 
