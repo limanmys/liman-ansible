@@ -1,8 +1,8 @@
-@if(server()->type != "linux_ssh")
+@if(server()->os != "ssh")
     <div class="alert alert-danger" role="alert">
     {{__("Bu eklentiyi kullanabilmek için anahtarlı bir linux sunucusu gerekmektedir.")}}
     </div>
-@php(die())
+@php(die())@endphp
 @endif
 
 <div class="alert alert-warning" role="alert">
@@ -17,7 +17,7 @@
     {
       $("#installButton").attr("disabled","true");
         showSwal('{{__("Yükleniyor...")}}','info',2000);
-        request('{{API('installAnsiblePackage')}}', new FormData(), function (response) {
+        request('{{API('install_package')}}', new FormData(), function (response) {
           observeInstallation();
         }, function(response){
             let error = JSON.parse(response);
@@ -27,7 +27,7 @@
 
     function observeInstallation()
     {
-        request('{{API('observeInstallation')}}', new FormData(), function (response) {
+        request('{{API('observe_installation')}}', new FormData(), function (response) {
           let json = JSON.parse(response);
           setTimeout(() => {
                 observeInstallation();

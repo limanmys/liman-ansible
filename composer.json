@@ -1,0 +1,31 @@
+{
+	"name": "liman/postgresql",
+	"type": "project",
+	"authors": [
+		{
+			"name": "Mustafa AKBEL",
+			"email": "mustafaakbell@gmail.com"
+		}
+	],
+	"require": {
+		"illuminate/database": "^8.0",
+		"illuminate/events": "^8.0",
+		"doctrine/dbal": "^2.10",
+		"illuminate/validation": "^8.0",
+		"illuminate/translation": "^8.0",
+		"illuminate/filesystem": "^8.0",
+		"vlucas/phpdotenv": "^5.1",
+		"illuminate/pagination": "^8.5"
+	},
+	"autoload": {
+		"files": [
+			"app/Helpers/Helpers.php"
+		],
+		"psr-4": {
+			"App\\": "app"
+		},
+		"classmap": [
+			"app"
+		]
+	}
+}

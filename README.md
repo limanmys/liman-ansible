@@ -1,1 +1,1 @@
-# Liman Ansible Eklentisi
+# Dockerı yönetmek üzere liman eklentisi olarak geliştirilmektedir.
