@@ -1,5 +1,5 @@
 {
-	"name": "liman/postgresql",
+	"name": "liman/ansible",
 	"type": "project",
 	"authors": [
 		{
@@ -8,7 +8,6 @@
 		}
 	],
 	"require": {
-		"illuminate/database": "^8.0",
 		"illuminate/events": "^8.0",
 		"doctrine/dbal": "^2.10",
 		"illuminate/validation": "^8.0",
