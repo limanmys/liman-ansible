@@ -9,26 +9,34 @@ class UserController
 
 	function get()
 	{
-        $arrayJson = [];
+        $userArray = [];
         $fileCheck = Command::runSudo(" [ -f {:userFilePath} ] 2>/dev/null 1>/dev/null && echo 1 || echo 0",[
             "userFilePath" => $this->userFilePath,
         ]);
         if ($fileCheck == "0") {
             return respond("notfoundfile", 202);
         }
-        $textJson = str_replace("\n", "", Command::runSudo("cat {:userFilePath}",[ "userFilePath" => $this->userFilePath]));
-        $textJson = substr($textJson, 0, -1);
-        $arrayJson = json_decode("[" . $textJson . "]", true);
-        if (!is_array($arrayJson)) {
-            return respond("error", 201);
+        
+        $userFileText = str_replace("\n", "", Command::runSudo("cat {:userFilePath}",[ "userFilePath" => $this->userFilePath]));
+        $userArray = json_decode($userFileText , true);
+
+        if (!is_array($userArray)) {
+            $userArray = [];
         }
+
         return view('table', [
-            "value" => $arrayJson,
+            "value" => $userArray,
             "title" => [
                 "İsim", "Password", "Sudo Yetkisi"
             ],
             "display" => [
                 "name", "password", "sudo"
+            ],
+            "menu" => [
+                'Sil' => [
+					'target' => "deleteUser",
+					'icon' => "fa-trash"
+				]
             ],
         ]);
     }
@@ -47,27 +55,56 @@ class UserController
             Command::runSudo("touch {:userFilePath}",[ "userFilePath" => $this->userFilePath]);
         }
 
-        $textJson = str_replace("\n", "",  Command::runSudo("cat {:userFilePath}",[ "userFilePath" => $this->userFilePath]));
-        $textJson = substr($textJson, 0, -1);
-        $arrayJson = json_decode("[" . $textJson . "]", true);
-
-        foreach ($arrayJson as $key => $value) {
-            if ($value["name"] == trim($username) && $value["password"] == trim($password)) {
-                return respond("Aynı kullanıcı bulunmaktadır", 201);
+        $userFileText = str_replace("\n", "",  Command::runSudo("cat {:userFilePath}",[ "userFilePath" => $this->userFilePath]));
+        $userArray = json_decode($userFileText , true);
+        
+        if (is_array($userArray)) {
+            foreach ($userArray as $key => $value) {
+                if ($value["name"] == trim($username) ) {
+                    return respond("Aynı kullanıcı bulunmaktadır", 201);
+                }
             }
+        }else{
+            $userArray = [];
         }
+        
         $item = array(
             "name" => $username,
             "password" => $password,
             "sudo" => $permission
         );
-        $text = json_encode($item);
-        $text = str_replace("\"", "\\\"", $text);
-        $output =  Command::runSudo("sh -c 'echo $text, >> {:userFilePath}'",["userFilePath" => $this->userFilePath]);
+
+        array_push($userArray,$item);
+        $textUserFile = json_encode($userArray);
+        $textUserFile = str_replace("\"", "\\\"", $textUserFile);
+        $output =  Command::runSudo("sh -c 'echo $textUserFile > {:userFilePath}'",[
+            "userFilePath" => $this->userFilePath]);
         if (trim($output) == "") {
             return respond("Başarıyla Eklendi", 200);
         } else {
             return respond($output, 201);
         }
     }
+
+    function delete(){
+        
+        $name = request("name");
+        $userFileText = str_replace("\n", "",  Command::runSudo("cat {:userFilePath}",[ "userFilePath" => $this->userFilePath]));
+        $userArray = json_decode($userFileText, true);
+
+        foreach($userArray as $key => $value) {
+            if($value['name'] == $name) {
+                unset($userArray[$key]);
+            }
+        }
+        $userFileText = json_encode($userArray);
+        $userFileText = str_replace("\"", "\\\"", $userFileText);
+        $output =  Command::runSudo("sh -c 'echo $userFileText > {:userFilePath}'",["userFilePath" => $this->userFilePath]);
+        if (trim($output) == "") {
+            return respond("Silindi", 200);
+        } else {
+            return respond($output, 201);
+        }
+    }
+
 }

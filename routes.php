@@ -10,6 +10,7 @@ return [
 
     "get_users" => "UserController@get",
     "add_user" => "UserController@add",
+    "delete_user" => "UserController@delete",
 
     "get_files" => "FileController@get",
     "get_file_content" => "FileController@getContent",

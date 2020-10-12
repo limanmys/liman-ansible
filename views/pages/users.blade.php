@@ -43,4 +43,31 @@
             Swal.close();
         });
     }
+
+    function deleteUser(line){
+         Swal.fire({
+            title: "{{ __('Onay') }}",
+            text: "{{ __('Silmek istediğinize emin misiniz?') }}",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085D6',
+            cancelButtonColor: '#d33',
+            cancelButtonText: "{{ __('İptal') }}",
+            confirmButtonText: "{{ __('Sil') }}"
+        }).then((result) => {
+            if (result.value) {
+                showSwal('{{__("Siliniyor..")}}','info');
+                let name = line.querySelector('#name').innerHTML;
+                let formData = new FormData();
+                formData.append("name",name);
+                request(API("delete_user") ,formData,function(response){
+                    showSwal('{{__("Silindi")}}', 'success',2000);
+                    $('.nav-tabs a[href="#users"]').click();
+                }, function(response){
+                    let error = JSON.parse(response);
+                    showSwal(error.message, 'error');
+                });
+            }
+        });
+    }
 </script>
