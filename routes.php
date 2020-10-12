@@ -14,6 +14,7 @@ return [
 
     "get_files" => "FileController@get",
     "get_file_content" => "FileController@getContent",
+    "upload_file" => "FileController@upload",
 
     "install_package" => "PackageController@install",
     "observe_installation" => "PackageController@observeInstallation",
