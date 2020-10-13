@@ -7,7 +7,7 @@
 
 <ul class="nav nav-tabs" role="tablist" style="margin-bottom: 15px;">
     <li class="nav-item">
-        <a class="nav-link active" onclick="" href="#home" data-toggle="tab"><i class="fas fa-home mr-2"></i></a>
+        <a class="nav-link active" onclick="getDashboard()" href="#home" data-toggle="tab"><i class="fas fa-home mr-2"></i></a>
     </li>
     <li class="nav-item">
         <a class="nav-link" onclick="getHosts()" href="#hosts" data-toggle="tab"><i class="fas fa-server mr-2"></i>{{ __('Hosts') }}</a>
@@ -48,11 +48,11 @@
     $('#taskModal').on('hidden.bs.modal', function (e) {
         $('#taskModal').find('.modal-body').html("");
     })
-/* 
+
     if(location.hash === ""){
-        getDockerInfo();
+        getDashboard();
     }
- */
+
     function onTaskSuccess(){
         showSwal('{{__("İsteğiniz başarıyla tamamlandı...")}}', 'success', 2000);
         setTimeout(function(){

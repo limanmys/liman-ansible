@@ -7,7 +7,7 @@ class FileController
 {
     function get()
     {
-        $output = runCommand("ls /opt/varlik");
+        $output = Command::runSudo("ls /opt/varlik");
         if (Command::runSudo(" [ -d /opt/varlik ] 2>/dev/null 1>/dev/null && echo 1 || echo 0") == "0" || trim($output) == "") {
             return respond("notfoundfile", 202);
         }

@@ -3,6 +3,8 @@
 return [
     "index" => "HomeController@index",
 
+    "get_dashboard" => "DashboardController@get",
+
     "get_hosts" => "HostsController@get",
     "add_host" => "HostsController@add",
     "add_group" => "HostsController@addGroup",
