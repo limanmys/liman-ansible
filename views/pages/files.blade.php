@@ -31,10 +31,41 @@
     </div>
     <div class="col-md-6" id="fileTextDiv">
         <textarea style="width:100%;height: 80%; min-height: 400px;" id="textDiv"></textarea>
+        <button  class="btn btn-primary mb-2 float-right" id="fileEditButton" onclick="editFile()" >
+            <i class="fas fa-edit"></i> {{ __('Dosya Güncelle') }}
+        </button>
     </div>
 </div>
 
 <script>
+
+    function editFile(){
+        Swal.fire({
+            title: "{{ __('Onay') }}",
+            text: "{{ __('Güncellemek istediğinize emin misiniz?') }}",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085D6',
+            cancelButtonColor: '#d33',
+            cancelButtonText: "{{ __('İptal') }}",
+            confirmButtonText: "{{ __('Güncelle') }}"
+        }).then((result) => {
+            if (result.value) {
+                showSwal('{{__("Güncelleniyor..")}}','info');
+                let data = new FormData();
+                let text = $('#textDiv').val()
+                let filePath = $("#fileTree").jstree("get_selected",true)[0]["original"]["text"];
+                data.append("filePath",filePath)
+                data.append("text",text)
+                request(API('edit_file'), data, function(res) {
+                    showSwal('{{__("Güncellendi")}}','success',2000);
+                }, function(res) {
+                    let error = JSON.parse(res);
+                    showSwal(error.message,'error');
+                });
+            }
+        });
+    }
 
     function onSuccess(upload){
         let data = new FormData();
@@ -57,17 +88,21 @@
     }
 
     $('#fileTree').on('changed.jstree', function (event, data) {
+        $('#textDiv').val("")
         filepath = data["node"]["original"]["text"];
         filetype =data["node"]["original"]["type"];
         if(filetype == "file"){
+            $("#fileEditButton").removeAttr('disabled');
             showSwal('{{__("Yükleniyor...")}}','info');
             var fileform = new FormData();
             fileform.append("filepath",filepath)
             request("{{API('get_file_content')}}", fileform, function(res) {
                 output = JSON.parse(res)["message"]
-                $('#textDiv').html(output);
+                $('#textDiv').val(output);
                 Swal.close();
             }, function(error) {});
+        }else{
+            $("#fileEditButton").attr('disabled','disabled');
         }
     });
 

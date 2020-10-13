@@ -85,4 +85,17 @@ class FileController
         return respond("Başarılı",200);
 
     }
+
+    function edit(){
+        $text = request("text");
+        $filePath = request("filePath");
+        Command::runSudo(
+			"bash -c \"echo @{:text} | base64 -d | tee @{:filePath}\"",
+			[
+				'text' => base64_encode($text),
+				'filePath' => $filePath
+			]
+        );
+        return respond("Başarılı",200);
+    }
 }
