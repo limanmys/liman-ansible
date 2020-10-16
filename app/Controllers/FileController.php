@@ -7,12 +7,10 @@ class FileController
 {
     function get()
     {
-        $output = Command::runSudo("ls /opt/varlik");
-        if (Command::runSudo(" [ -d /opt/varlik ] 2>/dev/null 1>/dev/null && echo 1 || echo 0") == "0" || trim($output) == "") {
-            return respond("notfoundfile", 202);
-        }
         $result = runScript("jstree.py", "", true);
-        return respond($result, 200);
+        return view('components.files-load',[
+            "data" => $result,
+        ]);
     }
 
     function getContent()
@@ -38,7 +36,7 @@ class FileController
             return respond("Klasör bulunmaktadır.",201);
         }
 
-        Command::runSudo("mkdir /opt/varlik/{:dirName}",[
+        Command::runSudo("mkdir -p /opt/varlik/{:dirName}",[
             "dirName" => $dirName
         ]);
         
