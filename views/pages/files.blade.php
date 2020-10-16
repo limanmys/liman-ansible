@@ -83,15 +83,7 @@
         };
         var form = new FormData();
         showSwal('{{__("Yükleniyor...")}}','info');
-        request("{{API('get_files')}}", form, function(response) {/* 
-            message = JSON.parse(response)["message"]
-            var json = JSON.parse(message.replace(/&quot;/g,'"'));
-            $('#fileTree').jstree({ 'core' : {
-                'data' : json 
-            }, 
-                plugins : ["types", "wholerow", "sort", "grid"],
-                types : types,
-            }) */
+        request("{{API('get_files')}}", form, function(response) {
             $("#filesDiv").html(response)
             Swal.close();
         }, function(error) {

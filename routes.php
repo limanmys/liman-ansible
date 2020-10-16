@@ -22,4 +22,9 @@ return [
     "install_package" => "PackageController@install",
     "observe_installation" => "PackageController@observeInstallation",
 
+    "get_playbooks" => "PlaybookController@get",
+    "get_content_playbook" => "PlaybookController@getContent",
+    "edit_playbook" => "PlaybookController@edit",
+    "delete_playbook" => "PlaybookController@delete",
+    "create_playbook" => "PlaybookController@create",
 ];

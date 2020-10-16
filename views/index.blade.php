@@ -18,6 +18,9 @@
     <li class="nav-item">
         <a class="nav-link" onclick="getFiles()" href="#files" data-toggle="tab"><i class="fas fa-file mr-2"></i>{{ __('Dosyalar') }}</a>
     </li>
+    <li class="nav-item">
+        <a class="nav-link" onclick="getPlaybooks()" href="#playbooks" data-toggle="tab"><i class="far fa-play-circle mr-2"></i>{{ __('Playbook') }}</a>
+    </li>
 </ul>
 <div class="tab-content">
 
@@ -37,6 +40,9 @@
         @include("pages.files")
     </div>
 
+    <div id="playbooks" class="tab-pane">
+        @include("pages.playbook")
+    </div>
 </div>
 
 @component('modal-component',[
