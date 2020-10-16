@@ -1,1 +1,1 @@
-# Dockerı yönetmek üzere liman eklentisi olarak geliştirilmektedir.
+#Ansible arayüzden yönetmek amacıyla liman eklentisi olarak geliştirilmektedir.
