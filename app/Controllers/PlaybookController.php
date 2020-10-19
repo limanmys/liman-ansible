@@ -122,11 +122,12 @@ class PlaybookController
 
     public function run()
     {
-		Command::runSudo("sed -i '/hosts: /c\    hosts: {:group}' /var/playbooks/{:filename}",[
+ 		Command::runSudo("sed -i 's/hosts: .*/hosts: {:group}/g' /var/playbooks/{:filename}",[
 			'filename' => request("filename"),
 			'group' => request("group"),
 
-		]);
+        ]);
+        
 		return respond(
 			view('task', [
 				'onFail' => 'onTaskFail',
