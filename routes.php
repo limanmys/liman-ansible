@@ -27,4 +27,8 @@ return [
     "edit_playbook" => "PlaybookController@edit",
     "delete_playbook" => "PlaybookController@delete",
     "create_playbook" => "PlaybookController@create",
+    "run_playbook" => "PlaybookController@run",
+
+    "runTask" => "TaskController@runTask",
+    "checkTask" => "TaskController@checkTask",
 ];

@@ -32,7 +32,7 @@
         <div class="col-md-6 ">
                 <div class="card shadow p-3 mb-5 bg-white rounded" id="loginAttemtChart" >
                     <div class="card-header">
-                        <h3 class="card-title">{{$source["name"]}}</h3>
+                        <h3 class="card-title font-weight-bold">{{\Illuminate\Support\Str::title($source["name"])}}</h3>
                     </div>
                     <div class="card-body">
                         <div id="accordion">
@@ -46,12 +46,24 @@
                             </div>
                             <div id="{{$source["name"]}}Size" class="panel-collapse in collapse">
                                 <div class="card-body">
-                                    <table class="table">
-                                        @foreach ($source["ip"] as $ip)
-                                            <tr> <th> {{$ip}}  </th>
-                                            @if(!strpos(trim($ip),'bulunmamaktadır') !== FALSE)
-                                                <td><button class="btn btn-danger btn-xs" onclick="deleteClientIpJS('{{$source['name']}}','{{$ip}}')">x</button></td>
-                                            @endif
+                                    <table class="table" style="text-align: center">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">#</th>
+                                                <th scope="col">Ip</th>
+                                                <th scope="col">Sil</th>
+                                                <th scope="col">Ssh İd Ekle</th>
+                                            </tr>
+                                        </thead>
+                                        @foreach ($source["ip"] as $key => $ip)
+                                            
+                                            <tr> 
+                                                <th scope="row">{{$key+1}}</th>
+                                                <td> {{$ip}}  </td>
+                                                @if(!strpos(trim($ip),'bulunmamaktadır') !== FALSE)
+                                                    <td><button class="btn btn-danger btn-xs" onclick="deleteClientIpJS('{{$source['name']}}','{{$ip}}')"><i class="fas fa-times"></i></button></td>
+                                                @endif
+                                                <td><button class="btn btn-primary btn-xs" onclick="deleteClientIpJS('{{$source['name']}}','{{$ip}}')"><i class="fas fa-plus"></i></button></td>
                                             </tr>
                                         @endforeach
                                     </table>
@@ -80,28 +92,38 @@
     "submit_text" => "Ekle"
 ])
 
-@include('modal',[
-    "id"=>"deleteClientIpModal",
-    "title" => "Client Ip Silme",
-    "url" => API('delete_ip'),
-    "next" => "reload",
-    "text" => "Bu işlem geri alınamaz. Silmek istediğinize emin misiniz ?",
-    "inputs" => [
-        "deletehostsname:deletehostsname" => "deletehostsname:hidden",
-        "ipaddress:ipaddress" => "ipaddress:hidden",
-    ],
-    "submit_text" => "Sil"
-])
-
 
 <script>
+
     function addClientIpJS(name){
         $('[name=hostsname]').val(name);
         $("#addClientIpModal").modal("show");
     }
+
     function deleteClientIpJS(name,ipaddress){
-        $('[name=deletehostsname]').val(name);
-        $('[name=ipaddress]').val(ipaddress);
-        $("#deleteClientIpModal").modal("show");
+        Swal.fire({
+            title: "{{ __('Onay') }}",
+            text: "{{ __('Silmek istediğinize emin misiniz?') }}",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085D6',
+            cancelButtonColor: '#d33',
+            cancelButtonText: "{{ __('İptal') }}",
+            confirmButtonText: "{{ __('Sil') }}"
+        }).then((result) => {
+            if (result.value) {
+                showSwal('{{__("Siliniyor..")}}','info');
+                let formData = new FormData();
+                formData.append("deletehostsname",name);
+                formData.append("ipaddress",ipaddress);
+                request(API("delete_ip") ,formData,function(response){
+                    showSwal('{{__("Silindi")}}', 'success',2000);
+                    reload();
+                }, function(response){
+                    let error = JSON.parse(response);
+                    showSwal(error.message, 'error');
+                });
+            }
+        });
     }
 </script>

@@ -43,7 +43,48 @@
 ])
 @endcomponent
 
+@component('modal-component',[
+    "id" => "runPlaybookComponent",
+    "title" => "Playbook Çalıştır",
+    "footer" => [
+        "text" => "Çalıştır",
+        "class" => "btn-success",
+        "onclick" => "runPlaybook()"
+    ]
+])
+    @include('inputs', [
+        "inputs" => [
+            "Grup:group" => \App\Controllers\PlaybookController::getHostsSelect(),
+            "filename:filename" => "filename:hidden",
+        ]
+    ])
+@endcomponent
+
 <script>
+
+    function runPlaybook(){
+        showSwal('{{__("Yükleniyor...")}}', 'info');
+        let fileName = $("#runPlaybookComponent").find('input[name="filename"]').val(); 
+        let group = $("#runPlaybookComponent").find('select[name="group"]').val(); 
+        let formData = new FormData();
+        formData.append("filename", fileName);
+        formData.append("group", group);
+        request(API("run_playbook"), formData, function(response) {
+            $('#runPlaybookComponent').modal('hide');
+            $('#taskModal').find('.modal-body').html(JSON.parse(response).message);
+            $('#taskModal').modal("show"); 
+            Swal.close();
+        }, function(response) {
+            let error = JSON.parse(response).message
+            showSwal(error, 'error');
+        });
+    }
+
+    function openRunPlaybookComponent(line){ 
+        let fileName = line.querySelector("#name").innerHTML;
+        $("#runPlaybookComponent").find('input[name="filename"]').val(fileName); 
+        $('#runPlaybookComponent').modal('show');
+    }
 
     function openPlaybookComponent(){
         $('#createPlaybookComponent').find('#fileTextarea').remove();
@@ -51,6 +92,7 @@
         $('#createPlaybookComponent').find('.modal-body').append(textareaFormElement);
         $('#createPlaybookComponent').modal('show');
     }
+
     function createPlaybookFile(){
         showSwal('{{__("Oluşturuluyor..")}}','info');
         let fileName = $("#createPlaybookComponent").find('input[name="filename"]').val(); 
@@ -71,7 +113,6 @@
         let form = new FormData();
         showSwal('{{__("Yükleniyor...")}}','info');
         request(API('get_playbooks'), form, function(response) {
-            console.log(response)
             $('#playbookTable').html(response).find('table').DataTable(dataTablePresets('normal'));
             Swal.close();
         }, function(error) {
