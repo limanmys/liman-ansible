@@ -31,7 +31,7 @@ class HostsController
         ]);
     }
 
-    function getHostContent()
+    function getContent()
     {
         $hostName = request("hostName");
         $output = Command::runSudo("cat {:hostsfilepath} | grep -v '^#'", [
@@ -55,7 +55,7 @@ class HostsController
 				return ['ip' => $i];
             }, $ips)
             ->toArray();
-            
+
         return view('table', [
             'value' => $ipArray,
             'title' => ['Ip Adresi'],

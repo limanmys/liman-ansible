@@ -1,33 +1,51 @@
 <div id="hostsDiv"></div>
 
-
-
-
-
 @component('modal-component',[
     "id" => "hostContentModal",
     "title" => "Host İçeriği"
 ])
-    <button class="btn btn-primary mb-2" onclick="addClientIpJS()">
-        <i class="fas fa-plus"></i> {{ __('Client Ekle') }}
-    </button>
+    @include('modal-button',[
+        "class" => "btn btn-primary mb-2",
+        "target_id" => "addClientIpModal",
+        "text" => "Client Ekle",
+        "icon" => "fas fa-plus mr-1"
+    ])
     <div id="hostContentTable"></div>
 @endcomponent
 
-@include('modal',[
-    "id"=>"addClientIpModal",
+@component('modal-component',[
+    "id" => "addClientIpModal",
     "title" => "Client Ip Ekleme",
-    "url" => API('add_host'),
-    "next" => "reloadModalTable",
-    "inputs" => [
-        "hostsname:hostname" => "hostsname:hidden",
-        "Ip Adresi" => "ipaddress:text:Ip Adresi (Örn : 172.0.0.1)",
-    ],
-    "submit_text" => "Ekle"
+    "footer" => [
+        "text" => "Ekle",
+        "class" => "btn-primary",
+        "onclick" => "addClient()"
+    ]
 ])
+    @include('inputs', [
+        "inputs" => [
+            "Ip Adresi" => "ipaddress:text:Ip Adresi (Örn : 172.0.0.1)",
+        ]
+    ])
+@endcomponent
 
 <script>
     let HOSTNAME =  ""
+
+    function addClient(){
+        showSwal('{{__("Ekleniyor..")}}','info');
+        let formData = new FormData();
+        let ip = $('#addClientIpModal').find('input[name=ipaddress]').val();
+        formData.append("hostsname",HOSTNAME)
+        formData.append("ipaddress",ip)
+        request(API("add_host") ,formData,function(response){
+            showSwal('{{__("Eklendi")}}', 'success',2000);
+            reloadModalTable();
+        }, function(response){
+            let error = JSON.parse(response);
+            showSwal(error.message, 'error');
+        });
+    }
 
     function deleteClientIpJS(line){
         Swal.fire({
@@ -57,11 +75,6 @@
         });
     }
 
-    function addClientIpJS(line){
-        $('#addClientIpModal').find('input[name=hostsname]').val(HOSTNAME);
-        $("#addClientIpModal").modal("show");
-    }
-
     function getHosts(){
         let form = new FormData();
         showSwal('{{__("Yükleniyor...")}}','info');
@@ -77,8 +90,6 @@
     function getHostsContent(line){
         let hostName = line.querySelector("#name").innerHTML;
         HOSTNAME = hostName;
-    console.log(HOSTNAME)
-
         let form = new FormData();
         form.append("hostName",hostName);
         showSwal('{{__("Yükleniyor...")}}','info');
