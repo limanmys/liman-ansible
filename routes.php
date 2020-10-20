@@ -9,6 +9,7 @@ return [
     "add_host" => "HostsController@add",
     "add_group" => "HostsController@addGroup",
     "delete_ip" => "HostsController@delete",
+    "get_host_content" => "HostsController@getHostContent",
 
     "get_users" => "UserController@get",
     "add_user" => "UserController@add",

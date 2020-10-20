@@ -8,47 +8,65 @@ class HostsController
 {
     protected $hostsfilepath = "/etc/ansible/hosts";
 
-    function get()
+    function get(){
+		$output = Command::runSudo("cat {:hostsfilepath} | grep -v '^#'", [
+            "hostsfilepath" => $this->hostsfilepath,
+		]);
+        preg_match_all('/\[(.*)\]/', $output, $matches);
+        $hostNameArray = collect($matches[1])
+			->map(function ($i) {
+				return ['name' => $i];
+			}, $matches[1])
+            ->toArray();
+        return view('table', [
+            'value' => $hostNameArray,
+            'title' => ['Host Adı'],
+            'display' => ['name'],
+            'menu' => [
+                'Gör' => [
+                    'target' => 'getHostsContent',
+                    'icon' => 'fa-eye',
+                ],
+            ]
+        ]);
+    }
+
+    function getHostContent()
     {
+        $hostName = request("hostName");
         $output = Command::runSudo("cat {:hostsfilepath} | grep -v '^#'", [
             "hostsfilepath" => $this->hostsfilepath,
         ]) . " [";
         $output = str_replace("\n", " ", $output);
-        preg_match_all('/\[.*?(?=\[)/', $output, $matches);
-        $data = [];
+        preg_match('/\['.$hostName.'\s*](.*?)(?=\[)/', $output, $matches);
 
-        foreach ($matches[0] as $key => $value) {
-            preg_match('/\[(.*)\]/', $value, $name);
-            preg_match('/](.*)/', $value, $ip);
+        $ips = trim($matches[1]);
+
+        if ($ips == "") {
             $ips = [];
-            if (trim($ip[1]) == "") {
-                $ips[0] = "Client bulunmamaktadır";
-            } else if (strpos(trim($ip[1]), ' ') !== FALSE) {
-                $ips = explode(" ", trim($ip[1]));
-            } else {
-                $ips[0] = $ip[1];
-            }
-            $ips = array_filter($ips);
-            $item = array(
-                "name" => $name[1],
-                "ip" => $ips,
-            );
-            array_push($data, $item);
+        } else if (strpos($ips, ' ') !== FALSE) {
+            $ips = explode(" ", $ips);
+        } else {
+            $ips[0] = $ips;
         }
 
-        $grupsuz = Command::runSudo("cat {:hostsfilepath} | grep -v '^#' | sed -n -e '/\[.*/,/\\$/!p'", [
-            "hostsfilepath" => $this->hostsfilepath,
+        $ipArray = collect($ips)
+			->map(function ($i) {
+				return ['ip' => $i];
+            }, $ips)
+            ->toArray();
+            
+        return view('table', [
+            'value' => $ipArray,
+            'title' => ['Ip Adresi'],
+            'display' => ['ip'],
+            'menu' => [
+                'Sil' => [
+                    'target' => 'deleteClientIpJS',
+                    'icon' => 'fa-trash',
+                ],
+            ]
         ]);
-
-        $grupsuz = explode("\n", $grupsuz);
-        $grupsuz = array_filter($grupsuz);
-        $item = array(
-            "name" => "Grupsuz",
-            "ip" => $grupsuz
-        );
-        array_push($data, $item);
-
-        return view('components.data-host-view', ['data' => $data]);
     }
 
     function add()
