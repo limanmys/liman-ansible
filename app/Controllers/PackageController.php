@@ -15,17 +15,19 @@ class PackageController
 	}
 	function install()
 	{
-		$command = "bash -c 'DEBIAN_FRONTEND=noninteractive apt install ansible -qqy >/tmp/limanLog 2>&1 & disown'";
-		Command::runSudo($command);
-		return respond("started", 200);
+		return respond(
+			view('task', [
+				'onFail' => 'onTaskFail',
+				'onSuccess' => 'onTaskSuccess',
+				'tasks' => [
+					0 => [
+						'name' => 'InstallPackage',
+						'attributes' => []
+					]
+				]
+			]),
+			200
+		);
 	}
 
-	function observeInstallation()
-	{
-		if ($this->verifyInstallation()) {
-			return respond(navigate(''), 300);
-		}
-		$log = Command::runSudo("cat /tmp/limanLog");
-		return respond($log, 200);
-	}
 }

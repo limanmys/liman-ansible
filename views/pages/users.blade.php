@@ -1,5 +1,5 @@
 @include('modal-button',[
-    "class"     =>  "btn btn-outline-primary mb-2",
+    "class"     =>  "btn btn-primary mb-2",
     "target_id" =>  "addUserModal",
     "text"      =>  "Kullanıcı Ekle",
     "icon" => "fas fa-plus"

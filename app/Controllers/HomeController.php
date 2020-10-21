@@ -8,4 +8,9 @@ class HomeController
 	{
 		return view('index');
 	}
+
+	function install()
+	{
+		return view('install');
+	}
 }

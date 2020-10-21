@@ -1,4 +1,4 @@
-@if(server()->os != "ssh")
+@if(server()->type != "ssh")
     <div class="alert alert-danger" role="alert">
     {{__("Bu eklentiyi kullanabilmek için anahtarlı bir linux sunucusu gerekmektedir.")}}
     </div>
@@ -10,32 +10,39 @@
 </div>
 
 <button id="installButton" class="btn btn-secondary" onclick="startInstallation()">{{__("Ansible paketini depodan kur.")}}</button>
-<pre id="output"></pre>
+
+@component('modal-component',[
+    "id" => "taskModal",
+    "title" => "Görev İşleniyor",
+])@endcomponent
 
 <script>
-    function startInstallation()
-    {
-      $("#installButton").attr("disabled","true");
-        showSwal('{{__("Yükleniyor...")}}','info',2000);
-        request('{{API('install_package')}}', new FormData(), function (response) {
-          observeInstallation();
-        }, function(response){
-            let error = JSON.parse(response);
-            showSwal(error.message,'error',2000);
-        })
+    $('#taskModal').on('hidden.bs.modal', function (e) {
+      $('#taskModal').find('.modal-body').html("");
+    })
+
+    function onTaskSuccess(){
+      showSwal('{{__("İsteğiniz başarıyla tamamlandı...")}}', 'success', 2000);
+      setTimeout(function(){
+          $('#taskModal').modal("hide"); 
+      }, 2000);
+      window.location.href = 'index';
     }
 
-    function observeInstallation()
+    function onTaskFail(){
+      showSwal('{{__("İsteğiniz yerine getirilirken bir hata oluştu!")}}', 'error', 2000);
+    }
+
+    function startInstallation()
     {
-        request('{{API('observe_installation')}}', new FormData(), function (response) {
-          let json = JSON.parse(response);
-          setTimeout(() => {
-                observeInstallation();
-            }, 2000);
-          $("#output").text(json["message"]);
-        }, function(response){
-            let error = JSON.parse(response);
-            showSwal(error.message,'error',2000);
-        })
+      showSwal('{{__("Yükleniyor...")}}','info',2000);
+      request(API('install_package'), new FormData(), function (response) {
+        $("#installButton").attr("disabled","true");
+        $('#taskModal').find('.modal-body').html(JSON.parse(response).message);
+        $('#taskModal').modal("show"); 
+      }, function(response){
+          let error = JSON.parse(response);
+          showSwal(error.message,'error',2000);
+      })
     }
 </script>

@@ -2,6 +2,7 @@
 
 return [
     "index" => "HomeController@index",
+    "install" => "HomeController@install",
 
     "get_dashboard" => "DashboardController@get",
 
