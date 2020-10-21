@@ -20,10 +20,9 @@
 @endif
 
 <script>
-    let data = '{{$data}}'
+    data = '{{$data}}'
     if(data != ""){
         data = JSON.parse(data.replace(/&quot;/g,'"'))
-        console.log(data)
         let types = {
             "directory" : {
                 "icon" : "fas fa-folder"

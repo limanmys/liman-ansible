@@ -24,7 +24,7 @@ class SSHEngine implements ICommandEngine
 	public static function sudo()
 	{
 		return Formatter::run(
-			'echo :password | base64 -d | sudo -S -p " " id 2>/dev/null 1>/dev/null; sudo ',
+			'echo @{:password} | base64 -d | sudo -S -p " " id 2>/dev/null 1>/dev/null; sudo ',
 			['password' => base64_encode(self::$password . "\n")]
 		);
 	}

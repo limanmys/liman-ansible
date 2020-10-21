@@ -1,3 +1,10 @@
+@include('modal-button',[
+    "class"     =>  "btn btn-primary mb-2",
+    "target_id" =>  "addGroupModal",
+    "text"      =>  "Grup Ekle",
+    "icon" => "fas fa-plus"
+])
+
 <div id="hostsDiv"></div>
 
 @component('modal-component',[
@@ -29,8 +36,60 @@
     ])
 @endcomponent
 
+@include('modal',[
+    "id"=>"addGroupModal",
+    "title" => "Grup Ekleme",
+    "url" => API('add_group'),
+    "next" => "reload",
+    "inputs" => [
+        "Grup Adı" => "groupname:text:Grup Adı",
+        "Ip Adresi" => "ipaddress:text:Ip Adresi Giriniz",
+    ],
+    "submit_text" => "Ekle"
+])
+
+@component('modal-component',[
+    "id" => "addSshKeyComponent",
+    "title" => "Ssh Key Ekle",
+    "footer" => [
+        "text" => "Ekle",
+        "class" => "btn-success",
+        "onclick" => "addSshKey()"
+    ]
+])
+    @include('inputs', [
+        "inputs" => [
+            "Kullanıcılar:user" => \App\Controllers\HostsController::getUserSelect(),
+            "ipaddress:ipaddress" => "ipaddress:hidden",
+        ]
+    ])
+@endcomponent
+
+
 <script>
     let HOSTNAME =  ""
+
+    function addSshKey(){
+        showSwal('{{__("Ekleniyor..")}}','info');
+        let ipAddress = $('#addSshKeyComponent').find('input[name=ipaddress]').val();
+        let username = $('#addSshKeyComponent').find('select[name=user]').val();
+        let formData = new FormData();
+        formData.append("username",username)
+        formData.append("ipAddress",ipAddress)
+        request(API("add_ssh_key") ,formData,function(response){
+            showSwal('{{__("Eklendi")}}', 'success',2000);
+        }, function(response){
+            let error = JSON.parse(response);
+            showSwal(error.message, 'error');
+        });
+    }
+
+    function openAddSshKeyComponent(line){
+        let ipAddress = line.querySelector("#ip").innerHTML;
+        console.log(ipAddress)
+        $('#addSshKeyComponent').find('input[name=ipaddress]').val(ipAddress);
+        $('#addSshKeyComponent').modal("show"); 
+    }
 
     function addClient(){
         showSwal('{{__("Ekleniyor..")}}','info');

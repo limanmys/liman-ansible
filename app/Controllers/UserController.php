@@ -73,12 +73,14 @@ class UserController
             "password" => $password,
             "sudo" => $permission
         );
-
         array_push($userArray,$item);
         $textUserFile = json_encode($userArray);
         $textUserFile = str_replace("\"", "\\\"", $textUserFile);
-        $output =  Command::runSudo("sh -c 'echo $textUserFile > {:userFilePath}'",[
-            "userFilePath" => $this->userFilePath]);
+        $output =  Command::runSudo("sh -c \"echo {:textUserFile} > {:userFilePath}\"",[
+            "textUserFile" => $textUserFile,
+            "userFilePath" => $this->userFilePath
+        ]);
+        
         if (trim($output) == "") {
             return respond("Başarıyla Eklendi", 200);
         } else {

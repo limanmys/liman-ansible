@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Utils\Command\Command;
+use App\Utils\Command\SSHEngine;
 
 class HostsController
 {
@@ -61,6 +62,10 @@ class HostsController
             'title' => ['Ip Adresi'],
             'display' => ['ip'],
             'menu' => [
+                'Ssh Key Ekle' => [
+                    'target' => 'openAddSshKeyComponent',
+                    'icon' => 'fa-plus',
+                ],
                 'Sil' => [
                     'target' => 'deleteClientIpJS',
                     'icon' => 'fa-trash',
@@ -166,5 +171,58 @@ class HostsController
         } else {
             return respond($output, 201);
         }
+    }
+
+    public static function getUserSelect(){
+        $userFilePath = "/etc/ansible/users";
+        $userFileText = str_replace("\n", "", Command::runSudo("cat {:userFilePath}",[ "userFilePath" => $userFilePath]));
+        $userArray = json_decode($userFileText , true);
+        $userNameArray = [];
+        if(!empty($userArray)){
+            foreach ($userArray as $key => $value) {
+                array_push($userNameArray,$value["name"]);
+            }
+        }
+        return collect($userNameArray)
+                ->map(function ($i) {
+                    return ['name' => $i];
+                }, $userNameArray)
+                ->pluck('name', 'name')
+                ->toArray();
+    }
+
+    function addShhKey(){
+        $userFilePath = "/etc/ansible/users";
+        $ipAddress = request("ipAddress");
+        $username = request("username");
+        $userFileText = str_replace("\n", "", Command::runSudo("cat {:userFilePath}",[ "userFilePath" => $userFilePath]));
+        $userArray = json_decode($userFileText , true);
+
+        foreach ($userArray as $key => $value) {
+            if($value["name"] == $username){
+                $password = $value["password"];
+            }
+        }
+
+        $sshKey = Command::runSudo("cat ~/.ssh/id_rsa.pub");
+
+        SSHEngine::init($ipAddress, $username, $password);
+        Command::bindEngine(SSHEngine::class);
+        $sshKeyCheck = Command::runSudo("cat /home/akbel/.ssh/authorized_keys | grep -e @{:sshKey} 1>/dev/null 2>/dev/null && echo 1 || echo 0",[
+            'sshKey' => $sshKey,
+        ]);
+        
+        if($sshKeyCheck == "1"){
+            return respond("Ssh key zaten bulunmaktadır",201);
+        }
+
+        Command::run(
+			"bash -c \"echo @{:sshKey} | base64 -d | tee -a  ~/.ssh/authorized_keys\"",
+			[
+				'sshKey' => base64_encode($sshKey),
+			]
+		);
+        
+        return respond("Eklendi",200);
     }
 }
