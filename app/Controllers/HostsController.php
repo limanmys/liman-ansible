@@ -40,8 +40,8 @@ class HostsController
         ]) . " [";
 
         $output = str_replace("\n", "---", $output);
-        preg_match('/\['.$hostName.'\s*](.*?)(?=\[)/', $output, $matches);
-        $lines = explode("---",$matches[1]);
+        preg_match('/\['.$hostName.'\s*](.*?)(?=\[)/', trim($output), $matches);
+        $lines = explode("---",trim($matches[1]));
         $lines = array_filter($lines);
         $data = [];
         foreach ($lines as $key => $line) {

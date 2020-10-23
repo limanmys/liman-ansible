@@ -71,8 +71,9 @@
 
 
 <script>
+    $('#addGroupModal').find('input[name=ansibleSshUser]').removeAttr('required');
+    $('#addGroupModal').find('input[name=ansibleSshPass]').removeAttr('required');
     let HOSTNAME =  ""
-
     function addSshKey(){
         showSwal('{{__("Ekleniyor..")}}','info');
         let ipAddress = $('#addSshKeyComponent').find('input[name=ipaddress]').val();
@@ -90,7 +91,6 @@
 
     function openAddSshKeyComponent(line){
         let ipAddress = line.querySelector("#ip").innerHTML;
-        console.log(ipAddress)
         $('#addSshKeyComponent').find('input[name=ipaddress]').val(ipAddress);
         $('#addSshKeyComponent').modal("show"); 
     }
