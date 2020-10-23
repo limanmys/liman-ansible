@@ -38,29 +38,27 @@ class HostsController
         $output = Command::runSudo("cat {:hostsfilepath} | grep -v '^#'", [
             "hostsfilepath" => $this->hostsfilepath,
         ]) . " [";
-        $output = str_replace("\n", " ", $output);
+
+        $output = str_replace("\n", "---", $output);
         preg_match('/\['.$hostName.'\s*](.*?)(?=\[)/', $output, $matches);
-
-        $ips = trim($matches[1]);
-
-        if ($ips == "") {
-            $ips = [];
-        } else if (strpos($ips, ' ') !== FALSE) {
-            $ips = explode(" ", $ips);
-        } else {
-            $ips[0] = $ips;
+        $lines = explode("---",$matches[1]);
+        $lines = array_filter($lines);
+        $data = [];
+        foreach ($lines as $key => $line) {
+            $lineParts = explode(" ",trim($line));
+            sizeof($lineParts) == 1  ? $sshUser = "-" : $sshUser = trim(explode("=",$lineParts[1])[1]) ;
+            sizeof($lineParts) == 1  ? $sshPass = "-" : $sshPass = trim(explode("=",$lineParts[2])[1]) ;
+            $data[]= [
+                "ip" => $lineParts[0],
+                "ssh_user" => $sshUser,
+                "ssh_pass" => $sshPass,
+            ];
         }
 
-        $ipArray = collect($ips)
-			->map(function ($i) {
-				return ['ip' => $i];
-            }, $ips)
-            ->toArray();
-
         return view('table', [
-            'value' => $ipArray,
-            'title' => ['Ip Adresi'],
-            'display' => ['ip'],
+            'value' => $data,
+            'title' => ['Ip Adresi','Ssh Kullanıcı','Ssh Şifre'],
+            'display' => ['ip','ssh_user','ssh_pass'],
             'menu' => [
                 'Ssh Key Ekle' => [
                     'target' => 'openAddSshKeyComponent',
@@ -76,14 +74,26 @@ class HostsController
 
     function add()
     {
+        validate([
+			'ipaddress' => 'required|string'
+        ]);
+        
         $hostsname = request("hostsname");
         $ipaddress = request("ipaddress");
+        $ansibleSshUser = request("ansibleSshUser");
+        $ansibleSshPass = request("ansibleSshPass");
+        if($ansibleSshUser == ""){
+            $clientLine = $ipaddress;
+        }else{
+            $clientLine = "$ipaddress ansible_ssh_user=$ansibleSshUser ansible_ssh_pass=$ansibleSshPass";
+        }
+
         if ($hostsname == "Grupsuz") {
             $grupsuz = Command::runSudo("cat {:hostsfilepath} | grep -v '^#' | sed -n -e '/\[.*/,/\\$/!p'", [
                 "hostsfilepath" => $this->hostsfilepath,
             ]);
             $grupsuz = explode("\n", $grupsuz);
-            if (in_array($ipaddress, $grupsuz)) {
+            if (in_array($clientLine, $grupsuz)) {
                 return respond("Böyle bir client bulunmaktadır.", 201);
             }
             $linenumber = Command::runSudo("cat {:hostsfilepath} | grep -n -v '^#' | sed -n -e '/\[.*/,/\\$/!p' | tail -n 1 | cut -d ':' -f1", [
@@ -101,14 +111,14 @@ class HostsController
             ]) . " [";
             $output = str_replace("\n", " ", $output);
             preg_match("/\[$hostsname\](.*?)(?=\[)/", $output, $hostzone);
-            if (strpos($hostzone[1], trim($ipaddress)) !== FALSE) {
+            if (strpos($hostzone[1], $clientLine) !== FALSE) {
                 return respond("Böyle bir client bulunmaktadır.", 201);
             }
-            $output = Command::runSudo("sh -c \"sed -i '/\[{:hostsname}\]/a {:ipaddress}' {:hostsfilepath}\"", [
+           $output = Command::runSudo("sh -c \"sed -i '/\[{:hostsname}\]/a {:clientLine}' {:hostsfilepath}\"", [
                 "hostsname" => $hostsname,
-                "ipaddress" => $ipaddress,
+                "clientLine" => $clientLine,
                 "hostsfilepath" => $this->hostsfilepath
-            ]);
+            ]); 
         }
         if (trim($output) == "") {
             return respond("Başarıyla Eklendi", 200);
@@ -121,20 +131,29 @@ class HostsController
     {
         $groupname = trim(request("groupname"));
         $ipaddress = request("ipaddress");
+        $ansibleSshUser = request("ansibleSshUser");
+        $ansibleSshPass = request("ansibleSshPass");
+        if($ansibleSshUser == ""){
+            $clientLine = $ipaddress;
+        }else{
+            $clientLine = "$ipaddress ansible_ssh_user=$ansibleSshUser ansible_ssh_pass=$ansibleSshPass";
+        }
+
         if (!filter_var(trim($ipaddress), FILTER_VALIDATE_IP)) {
             return respond("Geçerli ip adresi giriniz", 201);
         }
         $allgroupnametext = Command::runSudo("cat {:hostsfilepath} | grep -v '^#'", [
             "hostsfilepath" => $this->hostsfilepath,
         ]) . " [";
+
         $allgroupnametext = str_replace("\n", " ", $allgroupnametext);
         preg_match_all("/\[(.*?)\]/", $allgroupnametext, $allgroupname);
         if (in_array($groupname, $allgroupname[1])) {
             return respond("Böyle bir grup bulunmaktadır.", 201);
         }
-        $output = Command::runSudo("sh -c 'echo \"\n[{:groupname}]\n{:ipaddress}\"  >> {:hostsfilepath}'", [
+        $output = Command::runSudo("sh -c 'echo \"\n[{:groupname}]\n{:clientLine}\"  >> {:hostsfilepath}'", [
             "groupname" => $groupname,
-            "ipaddress" => $ipaddress,
+            "clientLine" => $clientLine,
             "hostsfilepath" => $this->hostsfilepath,
         ]);
 
@@ -150,22 +169,37 @@ class HostsController
     {
         $hostsname = trim(request("deletehostsname"));
         $ipaddress = trim(request("ipaddress"));
+        $ansibleSshUser = request("ansibleSshUser");
+        $ansibleSshPass = request("ansibleSshPass");
+        if($ansibleSshUser == "-"){
+            $clientLine = $ipaddress;
+        }else{
+            $clientLine = "$ipaddress ansible_ssh_user=$ansibleSshUser ansible_ssh_pass=$ansibleSshPass";
+        }
+        
+
         if ($hostsname == "Grupsuz") {
-            $linenumber = Command::runSudo("cat {:hostsfilepath} | grep -n -v '^#' | sed -n -e '/\[.*/,/\\$/!p' | grep @{:ipaddress} | cut -d ':' -f1", [
+            $linenumber = Command::runSudo("cat {:hostsfilepath} | grep -n -v '^#' | sed -n -e '/\[.*/,/\\$/!p' | grep @{:clientLine} | cut -d ':' -f1", [
                 "hostsfilepath" => $this->hostsfilepath,
-                "ipaddress" => $ipaddress,
+                "clientLine" => $clientLine,
             ]);
         } else {
-            $linenumber = Command::runSudo("cat -n {:hostsfilepath} | sed -n -e '/\[{:hostsname}/,/\[/ p' | grep @{:ipaddress} | awk '{print $1}'", [
+            $linenumber = Command::runSudo("cat -n {:hostsfilepath} | sed -n -e '/\[{:hostsname}/,/\[/ p' | grep @{:clientLine} | awk '{print $1}'", [
                 "hostsfilepath" => $this->hostsfilepath,
                 "hostsname" =>  $hostsname,
-                "ipaddress" => $ipaddress,
+                "clientLine" => $clientLine,
             ]);
         }
+        
+        if($linenumber == ""){
+            return respond("Hata Oluştu",201);
+        }
+
         $output = Command::runSudo("sh -c \"sed -i '{:linenumber} d' {:hostsfilepath}\"", [
             "hostsfilepath" => $this->hostsfilepath,
             "linenumber" => $linenumber,
         ]);
+
         if (trim($output) == "") {
             return respond("Başarıyla Silindi", 200);
         } else {

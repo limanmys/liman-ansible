@@ -32,6 +32,8 @@
     @include('inputs', [
         "inputs" => [
             "Ip Adresi" => "ipaddress:text:Ip Adresi (Örn : 172.0.0.1)",
+            "Ansible Ssh Kullanıcı" => "ansibleSshUser:text",
+            "Ansible Ssh Parola" => "ansibleSshPass:password",
         ]
     ])
 @endcomponent
@@ -44,6 +46,8 @@
     "inputs" => [
         "Grup Adı" => "groupname:text:Grup Adı",
         "Ip Adresi" => "ipaddress:text:Ip Adresi Giriniz",
+        "Ansible Ssh Kullanıcı" => "ansibleSshUser:text",
+        "Ansible Ssh Parola" => "ansibleSshPass:password",
     ],
     "submit_text" => "Ekle"
 ])
@@ -95,8 +99,12 @@
         showSwal('{{__("Ekleniyor..")}}','info');
         let formData = new FormData();
         let ip = $('#addClientIpModal').find('input[name=ipaddress]').val();
+        let user = $('#addClientIpModal').find('input[name=ansibleSshUser]').val();
+        let pass = $('#addClientIpModal').find('input[name=ansibleSshPass]').val();
         formData.append("hostsname",HOSTNAME)
         formData.append("ipaddress",ip)
+        formData.append("ansibleSshUser",user)
+        formData.append("ansibleSshPass",pass)
         request(API("add_host") ,formData,function(response){
             showSwal('{{__("Eklendi")}}', 'success',2000);
             reloadModalTable();
@@ -121,7 +129,11 @@
                 showSwal('{{__("Siliniyor..")}}','info');
                 let formData = new FormData();
                 let ip = line.querySelector("#ip").innerHTML;
+                let ansibleSshUser = line.querySelector("#ssh_user").innerHTML;
+                let ansibleSshPass = line.querySelector("#ssh_pass").innerHTML;
                 formData.append("deletehostsname",HOSTNAME);
+                formData.append("ansibleSshUser",ansibleSshUser);
+                formData.append("ansibleSshPass",ansibleSshPass);
                 formData.append("ipaddress",ip);
                 request(API("delete_ip") ,formData,function(response){
                     showSwal('{{__("Silindi")}}', 'success',2000);
