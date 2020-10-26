@@ -157,5 +157,21 @@ class PlaybookController
 			}, $matches[1])
 			->pluck('name', 'name')
 			->toArray();
+    }
+    
+    public function saveLog()
+    {
+        $logFileContent = request("logFileContent");
+        $logFileName = request("logFileName");
+
+        $checkDirectory = Command::runSudo('[ -d /var/playbook-logs ] && echo 1 || echo 0');
+        if ($checkDirectory == '0') {
+            Command::runSudo('mkdir /var/playbook-logs');
+        }
+        Command::runSudo("bash -c \"echo @{:logFileContent} | base64 -d | tee /var/playbook-logs/{:logFileName}\"",[
+            "logFileContent" => base64_encode($logFileContent),
+            "logFileName" => $logFileName
+        ]); 
+        return respond("Kaydedildi",200);
 	}
 }

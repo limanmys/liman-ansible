@@ -2,6 +2,7 @@
 
 namespace App\Tasks;
 
+use App\Utils\Command\Command;
 use App\Helpers\Formatter;
 use App\Utils\Task\Task;
 
@@ -19,7 +20,7 @@ class RunPlaybook extends Task
 		}
 
 		$this->attributes = $attributes;
-		$this->logFile = Formatter::run('/tmp/ansible-playbook-{:filename}.txt', [
+		$this->logFile = Formatter::run('/tmp/ansible-playbook-{:filename}', [
 			'filename' => $attributes['filename']
 		]);
 	}
@@ -32,7 +33,6 @@ class RunPlaybook extends Task
 
 	protected function after()
 	{
-		//example
-		//dd($this->attributes);
+
 	}
 }

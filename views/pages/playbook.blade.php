@@ -62,6 +62,31 @@
 
 <script>
 
+    function saveLogPlaybook(){
+        Swal.fire({
+            title: "Log Kaydet",
+            inputAttributes: {
+                placeholder: 'Dosya Adı'
+            },
+            input: 'text',
+            showCancelButton: true,
+            confirmButtonText: 'Kaydet',
+            }).then((result) => {
+                if (result.value) {
+                    let formData = new FormData();
+                    let logContent = $("#playbookTaskModal").find('#outputArea').text();
+                    formData.append("logFileName", result.value);
+                    formData.append("logFileContent", logContent);
+                    request(API("playbook_save_output") ,formData,function(response){
+                        $('#playbookTaskModal').modal('hide');
+                        showSwal('{{__("Kaydedildi")}}', 'success',2000);
+                    }, function(response){
+                        let error = JSON.parse(response);
+                        showSwal(error.message, 'error');
+                    }); 
+                }
+        });
+    }
     function runPlaybook(){
         showSwal('{{__("Yükleniyor...")}}', 'info');
         let fileName = $("#runPlaybookComponent").find('input[name="filename"]').val(); 
@@ -71,8 +96,8 @@
         formData.append("group", group);
         request(API("run_playbook"), formData, function(response) {
             $('#runPlaybookComponent').modal('hide');
-            $('#taskModal').find('.modal-body').html(JSON.parse(response).message);
-            $('#taskModal').modal("show"); 
+            $('#playbookTaskModal').find('.modal-body').html(JSON.parse(response).message);
+            $('#playbookTaskModal').modal("show"); 
             Swal.close();
         }, function(response) {
             let error = JSON.parse(response).message

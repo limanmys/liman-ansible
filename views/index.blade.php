@@ -16,10 +16,13 @@
         <a class="nav-link" onclick="getUsers()" href="#users" data-toggle="tab"><i class="fas fa-users mr-2"></i>{{ __('Kullanıcılar') }}</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" onclick="getFiles()" href="#files" data-toggle="tab"><i class="fas fa-file mr-2"></i>{{ __('Dosyalar') }}</a>
+        <a class="nav-link" onclick="getFiles()" href="#files" data-toggle="tab"><i class="fas fa-archive mr-2"></i>{{ __('Dosyalar') }}</a>
     </li>
     <li class="nav-item">
         <a class="nav-link" onclick="getPlaybooks()" href="#playbooks" data-toggle="tab"><i class="far fa-play-circle mr-2"></i>{{ __('Playbook') }}</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" onclick="getLogs()" href="#logs" data-toggle="tab"><i class="fas fa-file-alt mr-2"></i>{{ __('Loglar') }}</a>
     </li>
 </ul>
 <div class="tab-content">
@@ -43,6 +46,10 @@
     <div id="playbooks" class="tab-pane">
         @include("pages.playbook")
     </div>
+
+    <div id="logs" class="tab-pane">
+        @include("pages.logs")
+    </div>
 </div>
 
 @component('modal-component',[
@@ -50,7 +57,18 @@
     "title" => "Görev İşleniyor",
 ])@endcomponent
 
+@component('modal-component',[
+    "id" => "playbookTaskModal",
+    "title" => "Görev İşleniyor",
+    "footer" => [
+        "text" => "Kaydet",
+        "class" => "btn-primary",
+        "onclick" => "saveLogPlaybook()"
+    ]
+])@endcomponent
+
 <script>
+
     $('#taskModal').on('hidden.bs.modal', function (e) {
         $('#taskModal').find('.modal-body').html("");
     })

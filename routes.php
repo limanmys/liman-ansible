@@ -31,7 +31,13 @@ return [
     "delete_playbook" => "PlaybookController@delete",
     "create_playbook" => "PlaybookController@create",
     "run_playbook" => "PlaybookController@run",
+    "playbook_save_output" => "PlaybookController@saveLog",
 
     "runTask" => "TaskController@runTask",
     "checkTask" => "TaskController@checkTask",
+
+    "get_logs" => "LogController@get",
+    "get_content_log" => "LogController@getContent",
+    "delete_log" => "LogController@delete",
+
 ];
