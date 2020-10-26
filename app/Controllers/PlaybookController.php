@@ -164,6 +164,12 @@ class PlaybookController
         $logFileContent = request("logFileContent");
         $logFileName = request("logFileName");
 
+        $checkFile = Command::runSudo('[ -f /var/playbook-logs/{:logFileName} ] && echo 1 || echo 0',[
+            "logFileName" => $logFileName
+        ]);
+        if ($checkFile == '1') {
+            return respond("Bu isimde log bulunmaktadır",201);
+        }
         $checkDirectory = Command::runSudo('[ -d /var/playbook-logs ] && echo 1 || echo 0');
         if ($checkDirectory == '0') {
             Command::runSudo('mkdir /var/playbook-logs');
