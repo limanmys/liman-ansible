@@ -69,6 +69,23 @@
     ])
 @endcomponent
 
+@component('modal-component',[
+    "id" => "removeSshKeyComponent",
+    "title" => "Ssh Key Kaldır",
+    "footer" => [
+        "text" => "Kaldır",
+        "class" => "btn-danger",
+        "onclick" => "removeSshKey()"
+    ]
+])
+    @include('inputs', [
+        "inputs" => [
+            "Kullanıcılar:user" => \App\Controllers\HostsController::getUserSelect(),
+            "ipaddress:ipaddress" => "ipaddress:hidden",
+        ]
+    ])
+@endcomponent
+
 
 <script>
     $('#addGroupModal').find('input[name=ansibleSshUser]').removeAttr('required');
@@ -82,17 +99,40 @@
         formData.append("username",username)
         formData.append("ipAddress",ipAddress)
         request(API("add_ssh_key") ,formData,function(response){
+            $('#addSshKeyComponent').modal("hide");
             showSwal('{{__("Eklendi")}}', 'success',2000);
         }, function(response){
             let error = JSON.parse(response);
             showSwal(error.message, 'error');
         });
     }
-
+    
     function openAddSshKeyComponent(line){
         let ipAddress = line.querySelector("#ip").innerHTML;
         $('#addSshKeyComponent').find('input[name=ipaddress]').val(ipAddress);
         $('#addSshKeyComponent').modal("show"); 
+    }
+
+    function removeSshKey(){
+        showSwal('{{__("Kaldırılıyor..")}}','info');
+        let ipAddress = $('#removeSshKeyComponent').find('input[name=ipaddress]').val();
+        let username = $('#removeSshKeyComponent').find('select[name=user]').val();
+        let formData = new FormData();
+        formData.append("username",username)
+        formData.append("ipAddress",ipAddress)
+        request(API("remove_ssh_key") ,formData,function(response){
+            $('#removeSshKeyComponent').modal("hide");
+            showSwal('{{__("Kaldırıldı")}}', 'success',2000);
+        }, function(response){
+            let error = JSON.parse(response);
+            showSwal(error.message, 'error');
+        });
+    }
+
+    function openRemoveSshKeyComponent(line){
+        let ipAddress = line.querySelector("#ip").innerHTML;
+        $('#removeSshKeyComponent').find('input[name=ipaddress]').val(ipAddress);
+        $('#removeSshKeyComponent').modal("show"); 
     }
 
     function addClient(){
@@ -187,4 +227,5 @@
             showSwal(errorMessage,'error');
         });
     }
+    
 </script>

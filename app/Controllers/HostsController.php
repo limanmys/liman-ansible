@@ -64,6 +64,10 @@ class HostsController
                     'target' => 'openAddSshKeyComponent',
                     'icon' => 'fa-plus',
                 ],
+                'Ssh Key Kaldır' => [
+                    'target' => 'openRemoveSshKeyComponent',
+                    'icon' => 'fa-times-circle',
+                ],
                 'Sil' => [
                     'target' => 'deleteClientIpJS',
                     'icon' => 'fa-trash',
@@ -232,12 +236,12 @@ class HostsController
         $userFileText = str_replace("\n", "", Command::runSudo("cat {:userFilePath}",[ "userFilePath" => $userFilePath]));
         $userArray = json_decode($userFileText , true);
 
+        
         foreach ($userArray as $key => $value) {
             if($value["name"] == $username){
                 $password = $value["password"];
             }
         }
-
         $sshKey = Command::runSudo("cat ~/.ssh/id_rsa.pub");
 
         SSHEngine::init($ipAddress, $username, $password);
@@ -258,5 +262,39 @@ class HostsController
 		);
         
         return respond("Eklendi",200);
+    }
+
+    function removeShhKey(){
+        $userFilePath = "/etc/ansible/users";
+        $ipAddress = request("ipAddress");
+        $username = request("username");
+        $userFileText = str_replace("\n", "", Command::runSudo("cat {:userFilePath}",[ "userFilePath" => $userFilePath]));
+        $userArray = json_decode($userFileText , true);
+
+        
+        foreach ($userArray as $key => $value) {
+            if($value["name"] == $username){
+                $password = $value["password"];
+            }
+        }
+        $sshKey = Command::runSudo("cat ~/.ssh/id_rsa.pub");
+
+        SSHEngine::init($ipAddress, $username, $password);
+        Command::bindEngine(SSHEngine::class);
+
+        Command::runSudo("grep -v \"{:sshKey}\" ~/.ssh/authorized_keys > ~/.ssh/temp; mv ~/.ssh/temp ~/.ssh/authorized_keys",[
+            'sshKey' => $sshKey,
+        ]);
+
+        $sshKeyCheck = Command::runSudo("cat ~/.ssh/authorized_keys | grep -e @{:sshKey} 1>/dev/null 2>/dev/null && echo 1 || echo 0",[
+            'sshKey' => $sshKey,
+        ]);
+        
+        if($sshKeyCheck == "0"){
+            return respond("Silindi",200);
+        }else{
+            return respond("Hata oluştu",201);
+        }
+        
     }
 }
