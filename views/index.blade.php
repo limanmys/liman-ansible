@@ -1,8 +1,10 @@
-<?php 
-    $checkPackage = \App\Controllers\PackageController::verifyInstallation();
-    if(!$checkPackage){ 
-        echo "<script>window.location.href = '" . navigate('install') . "';</script>";
-    } 
+<?php
+$checkPackage = \App\Controllers\PackageController::verifyInstallation();
+if (!$checkPackage) {
+	echo "<script>window.location.href = '" .
+		navigate('install') .
+		"';</script>";
+}
 ?>
 
 <ul class="nav nav-tabs" role="tablist" style="margin-bottom: 15px;">

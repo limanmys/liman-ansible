@@ -7,8 +7,14 @@ class PackageController
 {
 	public static function verifyInstallation()
 	{
-		if (trim(Command::runSudo('dpkg -s ansible | grep "Status" | grep -w "install" 1>/dev/null 2>/dev/null && echo "1" || echo "0"')) == "1") {
-        	return true;
+		if (
+			trim(
+				Command::runSudo(
+					'dpkg -s ansible | grep "Status" | grep -w "install" 1>/dev/null 2>/dev/null && echo "1" || echo "0"'
+				)
+			) == '1'
+		) {
+			return true;
 		} else {
 			return false;
 		}
@@ -29,5 +35,4 @@ class PackageController
 			200
 		);
 	}
-
 }

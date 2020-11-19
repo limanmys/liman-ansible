@@ -78,7 +78,7 @@ abstract class Task
 				? TaskCheckStatusEnum::Success
 				: TaskCheckStatusEnum::Failed;
 		}
-		
+
 		$processOutput = $this->command(
 			'cat @{:logFile} && truncate -s 0 @{:logFile} 2> /dev/null',
 			['logFile' => $this->logFile]

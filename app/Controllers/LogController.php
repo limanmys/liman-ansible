@@ -6,7 +6,7 @@ use App\Utils\Command\Command;
 
 class LogController
 {
-    public function get()
+	public function get()
 	{
 		$checkDirectory = Command::run(
 			'[ -d /var/playbook-logs ] && echo 1 || echo 0'
@@ -37,38 +37,40 @@ class LogController
 		return view('table', [
 			'value' => $data,
 			'title' => ['Dosya Adı', 'Boyut', 'Tarih'],
-            'display' => ['name', 'size', 'date'],
-            'menu' => [
-                'Gör' => [
-                    'target' => 'showLogContent',
-                    'icon' => 'fa-eye',
-                ],
-                'Sil' => [
-                    'target' => 'deleteLog',
-                    'icon' => 'fa-trash',
-                ],
-            ],
+			'display' => ['name', 'size', 'date'],
+			'menu' => [
+				'Gör' => [
+					'target' => 'showLogContent',
+					'icon' => 'fa-eye'
+				],
+				'Sil' => [
+					'target' => 'deleteLog',
+					'icon' => 'fa-trash'
+				]
+			]
 		]);
-    }
-    
-    public function getContent()
-    {
-        $fileName = request("fileName");
-        $output = Command::runSudo("cat  /var/playbook-logs/{:fileName}", ["fileName" => $fileName]);
-        return respond($output, 200);
-    }
+	}
 
-    public function delete()
-    {
-        $fileName = request('fileName');
-        $result = Command::runSudo('rm -rf /var/playbook-logs/{:fileName}', [
-            'fileName' => $fileName,
-        ]);
+	public function getContent()
+	{
+		$fileName = request('fileName');
+		$output = Command::runSudo('cat  /var/playbook-logs/{:fileName}', [
+			'fileName' => $fileName
+		]);
+		return respond($output, 200);
+	}
 
-        if (trim($result) == '') {
-            return respond('Silindi', 200);
-        } else {
-            return respond($result, 201);
-        }
-    }
+	public function delete()
+	{
+		$fileName = request('fileName');
+		$result = Command::runSudo('rm -rf /var/playbook-logs/{:fileName}', [
+			'fileName' => $fileName
+		]);
+
+		if (trim($result) == '') {
+			return respond('Silindi', 200);
+		} else {
+			return respond($result, 201);
+		}
+	}
 }

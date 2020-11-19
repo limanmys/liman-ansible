@@ -33,6 +33,5 @@ class RunPlaybook extends Task
 
 	protected function after()
 	{
-
 	}
 }
