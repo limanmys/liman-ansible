@@ -3,7 +3,8 @@
   "description": "",
   "scripts": {
     "prettier": "prettier",
-    "pre-commit": "lint-staged"
+    "pre-commit": "lint-staged",
+    "format": "prettier --write ./app && prettier --write ./lang && prettier --write ./views"
   },
   "prettier": {
     "phpVersion": "7.3",
