@@ -1,5 +1,5 @@
 {
-  "name": "ansible-extension",
+  "name": "liman-ansible",
   "description": "",
   "scripts": {
     "prettier": "prettier",
@@ -28,15 +28,17 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mustafaakbel/ansible-extension.git"
+    "url": "git+https://github.com/mustafaakbel/liman-ansible.git"
   },
   "bugs": {
-    "url": "https://github.com/mustafaakbel/ansible-extension/issues"
+    "url": "https://github.com/mustafaakbel/liman-ansible/issues"
   },
-  "homepage": "https://github.com/mustafaakbel/ansible-extension#readme",
+  "homepage": "https://github.com/mustafaakbel/liman-ansible#readme",
   "version": "1.0.0",
   "main": "index.js",
-  "dependencies": {},
+  "dependencies": {
+    "package.json": "^2.0.1"
+  },
   "author": "",
   "license": "ISC"
 }
