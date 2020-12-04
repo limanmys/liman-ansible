@@ -24,7 +24,6 @@ return [
     "edit_file" => "FileController@edit",
 
     "install_package" => "PackageController@install",
-    "observe_installation" => "PackageController@observeInstallation",
 
     "get_playbooks" => "PlaybookController@get",
     "get_content_playbook" => "PlaybookController@getContent",
