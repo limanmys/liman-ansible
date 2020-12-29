@@ -188,10 +188,13 @@ class HostsController
 	{
 		$groupname = trim(request('groupname'));
 
-		$textHostFile = Command::runSudo("ansible-inventory -i {:hostsFilePath} --list --yaml", [
-			'hostsFilePath' =>  $this->hostsFilePath
-		]);
-		$arrayHosts = yaml_parse($textHostFile)["all"]["children"];
+		$textHostFile = Command::runSudo(
+			'ansible-inventory -i {:hostsFilePath} --list --yaml',
+			[
+				'hostsFilePath' => $this->hostsFilePath
+			]
+		);
+		$arrayHosts = yaml_parse($textHostFile)['all']['children'];
 
 		if (array_key_exists($groupname, $arrayHosts)) {
 			return respond('Böyle bir grup bulunmaktadır.', 201);
