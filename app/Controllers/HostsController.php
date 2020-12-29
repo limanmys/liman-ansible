@@ -101,10 +101,13 @@ class HostsController
 		} else {
 			$clientLine = "$ipaddress ansible_ssh_user=$ansibleSshUser ansible_ssh_pass=$ansibleSshPass";
 		}
-		$textHostFile = Command::runSudo("ansible-inventory -i {:hostsFilePath} --list --yaml", [
-			'hostsFilePath' =>  $this->hostsFilePath
-		]);
-		$arrayHosts = yaml_parse($textHostFile)["all"]["children"];
+		$textHostFile = Command::runSudo(
+			'ansible-inventory -i {:hostsFilePath} --list --yaml',
+			[
+				'hostsFilePath' => $this->hostsFilePath
+			]
+		);
+		$arrayHosts = yaml_parse($textHostFile)['all']['children'];
 
 		if ($hostsname == 'Grupsuz') {
 			$grupsuz = Command::runSudo(
@@ -133,8 +136,15 @@ class HostsController
 				]
 			);
 		} else {
-
-			if (array_key_exists($ipaddress, $arrayHosts[$hostsname]["hosts"]) && $arrayHosts[$hostsname]["hosts"][$ipaddress]["ansible_ssh_user"] == $ansibleSshUser) {
+			if (
+				array_key_exists(
+					$ipaddress,
+					$arrayHosts[$hostsname]['hosts']
+				) &&
+				$arrayHosts[$hostsname]['hosts'][$ipaddress][
+					'ansible_ssh_user'
+				] == $ansibleSshUser
+			) {
 				return respond('Böyle bir client bulunmaktadır.', 201);
 			}
 
@@ -158,10 +168,13 @@ class HostsController
 	{
 		$groupname = trim(request('groupname'));
 
-		$textHostFile = Command::runSudo("ansible-inventory -i {:hostsFilePath} --list --yaml", [
-			'hostsFilePath' =>  $this->hostsFilePath
-		]);
-		$arrayHosts = yaml_parse($textHostFile)["all"]["children"];
+		$textHostFile = Command::runSudo(
+			'ansible-inventory -i {:hostsFilePath} --list --yaml',
+			[
+				'hostsFilePath' => $this->hostsFilePath
+			]
+		);
+		$arrayHosts = yaml_parse($textHostFile)['all']['children'];
 
 		if (array_key_exists($groupname, $arrayHosts)) {
 			return respond('Böyle bir grup bulunmaktadır.', 201);
