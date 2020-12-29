@@ -52,10 +52,11 @@ class PlaybookController
 	public function getContent()
 	{
 		$fileName = request('fileName');
-		$output = Command::runSudo('cat  /var/playbooks/{:fileName}', [
+		$output = Command::runSudo('cat  /var/playbooks/{:fileName} | base64', [
 			'fileName' => $fileName
 		]);
-		return respond($output, 200);
+
+		return respond(base64_decode($output), 200);
 	}
 
 	public function create()
@@ -93,7 +94,6 @@ class PlaybookController
 	{
 		$fileName = request('fileName');
 		$contentFile = request('contentFile');
-
 		$result = Command::runSudo(
 			"sh -c \"echo @{:contentFile}| base64 -d | tee /var/playbooks/{:fileName}\"  1>/dev/null",
 			[

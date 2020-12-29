@@ -32,8 +32,8 @@
     @include('inputs', [
         "inputs" => [
             "Ip Adresi" => "ipaddress:text:Ip Adresi (Örn : 172.0.0.1)",
-            "Ansible Ssh Kullanıcı" => "ansibleSshUser:text",
-            "Ansible Ssh Parola" => "ansibleSshPass:password",
+            "Ssh Kullanıcı" => "ansibleSshUser:text:Bağlanılacak makinenin ssh kullanıcı adı",
+            "Ssh Parola" => "ansibleSshPass:password:Bağlanılacak makinenin ssh kullanıcısının şifresi",
         ]
     ])
 @endcomponent
@@ -45,9 +45,6 @@
     "next" => "reload",
     "inputs" => [
         "Grup Adı" => "groupname:text:Grup Adı",
-        "Ip Adresi" => "ipaddress:text:Ip Adresi Giriniz",
-        "Ansible Ssh Kullanıcı" => "ansibleSshUser:text",
-        "Ansible Ssh Parola" => "ansibleSshPass:password",
     ],
     "submit_text" => "Ekle"
 ])

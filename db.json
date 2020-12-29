@@ -1,7 +1,7 @@
 {
     "name": "Ansible",
     "publisher": "Administrator",
-    "version": "0.2",
+    "version": "0.21",
     "database": [],
     "widgets": [],
     "views": [
@@ -18,7 +18,7 @@
     "icon": "fas fa-play",
     "require_key": "false",
     "verification": null,
-    "dependencies": null,
+    "dependencies": "php7.3-yaml",
     "sslPorts": null,
-    "version_code": 2
+    "version_code": 3
 }

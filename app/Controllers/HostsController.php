@@ -7,12 +7,12 @@ use App\Utils\Command\SSHEngine;
 
 class HostsController
 {
-	protected $hostsfilepath = '/etc/ansible/hosts';
+	protected $hostsFilePath = '/etc/ansible/hosts';
 
 	function get()
 	{
-		$output = Command::runSudo("cat {:hostsfilepath} | grep -v '^#'", [
-			'hostsfilepath' => $this->hostsfilepath
+		$output = Command::runSudo("cat {:hostsFilePath} | grep -v '^#'", [
+			'hostsFilePath' => $this->hostsFilePath
 		]);
 		preg_match_all('/\[(.*)\]/', $output, $matches);
 		$hostNameArray = collect($matches[1])
@@ -37,8 +37,8 @@ class HostsController
 	{
 		$hostName = request('hostName');
 		$output =
-			Command::runSudo("cat {:hostsfilepath} | grep -v '^#'", [
-				'hostsfilepath' => $this->hostsfilepath
+			Command::runSudo("cat {:hostsFilePath} | grep -v '^#'", [
+				'hostsFilePath' => $this->hostsFilePath
 			]) . ' [';
 
 		$output = str_replace("\n", '---', $output);
@@ -101,12 +101,16 @@ class HostsController
 		} else {
 			$clientLine = "$ipaddress ansible_ssh_user=$ansibleSshUser ansible_ssh_pass=$ansibleSshPass";
 		}
+		$textHostFile = Command::runSudo("ansible-inventory -i {:hostsFilePath} --list --yaml", [
+			'hostsFilePath' =>  $this->hostsFilePath
+		]);
+		$arrayHosts = yaml_parse($textHostFile)["all"]["children"];
 
 		if ($hostsname == 'Grupsuz') {
 			$grupsuz = Command::runSudo(
-				"cat {:hostsfilepath} | grep -v '^#' | sed -n -e '/\[.*/,/\\$/!p'",
+				"cat {:hostsFilePath} | grep -v '^#' | sed -n -e '/\[.*/,/\\$/!p'",
 				[
-					'hostsfilepath' => $this->hostsfilepath
+					'hostsFilePath' => $this->hostsFilePath
 				]
 			);
 			$grupsuz = explode("\n", $grupsuz);
@@ -121,29 +125,25 @@ class HostsController
 			);
 
 			$output = Command::runSudo(
-				"sh -c \"sed -i '{:linenumber} i {:ipaddress}' {:hostsfilepath}\"",
+				"sh -c \"sed -i '{:linenumber} i {:ipaddress}' {:hostsFilePath}\"",
 				[
 					'linenumber' => $linenumber,
 					'ipaddress' => $ipaddress,
-					'hostsfilepath' => $this->hostsfilepath
+					'hostsFilePath' => $this->hostsFilePath
 				]
 			);
 		} else {
-			$output =
-				Command::runSudo("cat {:hostsfilepath} | grep -v '^#'", [
-					'hostsfilepath' => $this->hostsfilepath
-				]) . ' [';
-			$output = str_replace("\n", ' ', $output);
-			preg_match("/\[$hostsname\](.*?)(?=\[)/", $output, $hostzone);
-			if (strpos($hostzone[1], $clientLine) !== false) {
+
+			if (array_key_exists($ipaddress, $arrayHosts[$hostsname]["hosts"]) && $arrayHosts[$hostsname]["hosts"][$ipaddress]["ansible_ssh_user"] == $ansibleSshUser) {
 				return respond('Böyle bir client bulunmaktadır.', 201);
 			}
+
 			$output = Command::runSudo(
-				"sh -c \"sed -i '/\[{:hostsname}\]/a {:clientLine}' {:hostsfilepath}\"",
+				"sh -c \"sed -i '/\[{:hostsname}\]/a {:clientLine}' {:hostsFilePath}\"",
 				[
 					'hostsname' => $hostsname,
 					'clientLine' => $clientLine,
-					'hostsfilepath' => $this->hostsfilepath
+					'hostsFilePath' => $this->hostsFilePath
 				]
 			);
 		}
@@ -157,34 +157,21 @@ class HostsController
 	function addGroup()
 	{
 		$groupname = trim(request('groupname'));
-		$ipaddress = request('ipaddress');
-		$ansibleSshUser = request('ansibleSshUser');
-		$ansibleSshPass = request('ansibleSshPass');
-		if ($ansibleSshUser == '') {
-			$clientLine = $ipaddress;
-		} else {
-			$clientLine = "$ipaddress ansible_ssh_user=$ansibleSshUser ansible_ssh_pass=$ansibleSshPass";
-		}
 
-		if (!filter_var(trim($ipaddress), FILTER_VALIDATE_IP)) {
-			return respond('Geçerli ip adresi giriniz', 201);
-		}
-		$allgroupnametext =
-			Command::runSudo("cat {:hostsfilepath} | grep -v '^#'", [
-				'hostsfilepath' => $this->hostsfilepath
-			]) . ' [';
+		$textHostFile = Command::runSudo("ansible-inventory -i {:hostsFilePath} --list --yaml", [
+			'hostsFilePath' =>  $this->hostsFilePath
+		]);
+		$arrayHosts = yaml_parse($textHostFile)["all"]["children"];
 
-		$allgroupnametext = str_replace("\n", ' ', $allgroupnametext);
-		preg_match_all('/\[(.*?)\]/', $allgroupnametext, $allgroupname);
-		if (in_array($groupname, $allgroupname[1])) {
+		if (array_key_exists($groupname, $arrayHosts)) {
 			return respond('Böyle bir grup bulunmaktadır.', 201);
 		}
+
 		$output = Command::runSudo(
-			"sh -c 'echo \"\n[{:groupname}]\n{:clientLine}\"  >> {:hostsfilepath}'",
+			"sh -c 'echo \"\n[{:groupname}]\n\"  >> {:hostsFilePath}'",
 			[
 				'groupname' => $groupname,
-				'clientLine' => $clientLine,
-				'hostsfilepath' => $this->hostsfilepath
+				'hostsFilePath' => $this->hostsFilePath
 			]
 		);
 
