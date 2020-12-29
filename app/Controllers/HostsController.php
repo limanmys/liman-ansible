@@ -294,7 +294,10 @@ class HostsController
 		);
 
 		if (!$checkKey) {
-			return respond("İlk olarak ansible sunucunuzda 'id_rsa.pub' adında ssh key oluşturunuz", 201);
+			return respond(
+				"İlk olarak ansible sunucunuzda 'id_rsa.pub' adında ssh key oluşturunuz",
+				201
+			);
 		}
 
 		$sshKey = Command::runSudo('cat ~/.ssh/id_rsa.pub');
