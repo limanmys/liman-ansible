@@ -13,6 +13,7 @@ return [
     "get_host_content" => "HostsController@getContent",
     "add_ssh_key" => "HostsController@addShhKey",
     "remove_ssh_key" => "HostsController@removeShhKey",
+    "delete_group" => "HostsController@deleteGroup",
 
     "get_users" => "UserController@get",
     "add_user" => "UserController@add",

@@ -88,6 +88,43 @@
     $('#addGroupModal').find('input[name=ansibleSshUser]').removeAttr('required');
     $('#addGroupModal').find('input[name=ansibleSshPass]').removeAttr('required');
     let HOSTNAME =  ""
+
+    function deleteGroup(line){
+        Swal.fire({
+            title: "{{ __('Onay') }}",
+            text: "{{ __('Silmek istediğinize emin misiniz?') }}",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085D6',
+            cancelButtonColor: '#d33',
+            cancelButtonText: "{{ __('İptal') }}",
+            confirmButtonText: "{{ __('Sil') }}"
+        }).then((result) => {
+            if (result.value) {
+                showSwal('{{__("Siliniyor..")}}','info');
+                let groupName = line.querySelector("#name").innerHTML;
+                let formData = new FormData();
+                formData.append("groupName",groupName)
+                request(API("delete_group") ,formData,function(response){
+                    showSwal('{{__("Silindi")}}', 'success',2000);
+                    getHosts()
+                }, function(response){
+                    let error = JSON.parse(response);
+                    if(error.message=="WARNING"){
+                        Swal.fire({
+                            position: 'center',
+                            type: 'warning',
+                            title: 'UYARI',
+                            text: 'Bu grup dolu olduğundan silinemez...',
+                        });
+                    }else{
+                        showSwal(error.message, 'error');
+                    }
+                });
+            }
+        });
+    }
+
     function addSshKey(){
         showSwal('{{__("Ekleniyor..")}}','info');
         let ipAddress = $('#addSshKeyComponent').find('input[name=ipaddress]').val();

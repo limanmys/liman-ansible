@@ -13,7 +13,7 @@
 ])
     @include('inputs', [
         "inputs" => [
-            "Dosya Adı" => "filename:text",
+            "Dosya Adı" => "filename:text:Dosya adını giriniz",
         ]
     ])
 @endcomponent

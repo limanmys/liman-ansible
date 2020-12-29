@@ -9,6 +9,31 @@ class HostsController
 {
 	protected $hostsFilePath = '/etc/ansible/hosts';
 
+	function deleteGroup()
+	{
+		$groupName = request("groupName");
+		$textHostFile = Command::runSudo("ansible-inventory -i {:hostsFilePath} --list --yaml", [
+			'hostsFilePath' =>  $this->hostsFilePath
+		]);
+		$arrayHosts = yaml_parse($textHostFile)["all"]["children"][$groupName];
+		if (!empty($arrayHosts["hosts"])) {
+			return respond("WARNING", 201);
+		}
+		Command::runSudo("sh -c \"sed -i '/\[\s*{:groupName}\s*\]/d' {:hostsFilePath}\"", [
+			'groupName' => $groupName,
+			'hostsFilePath' =>  $this->hostsFilePath
+		]);
+		$textHostFile = Command::runSudo("ansible-inventory -i {:hostsFilePath} --list --yaml", [
+			'hostsFilePath' =>  $this->hostsFilePath
+		]);
+		$checkGroup = yaml_parse($textHostFile)["all"]["children"][$groupName];
+		if (empty($checkGroup)) {
+			return respond("Silindi", 200);
+		} else {
+			return respond("Silinemedi", 201);
+		}
+	}
+
 	function get()
 	{
 		$output = Command::runSudo("cat {:hostsFilePath} | grep -v '^#'", [
@@ -28,6 +53,10 @@ class HostsController
 				'Gör' => [
 					'target' => 'getHostsContent',
 					'icon' => 'fa-eye'
+				],
+				'Sil' => [
+					'target' => 'deleteGroup',
+					'icon' => 'fa-trash'
 				]
 			]
 		]);
@@ -94,17 +123,13 @@ class HostsController
 
 		$hostsname = request('hostsname');
 		$ipaddress = request('ipaddress');
-		$ansibleSshUser = request('ansibleSshUser');
-		$ansibleSshPass = request('ansibleSshPass');
+		$ansibleSshUser = trim(request('ansibleSshUser'));
+		$ansibleSshPass = trim(request('ansibleSshPass'));
 		if ($ansibleSshUser == '') {
 			$clientLine = $ipaddress;
 		} else {
 			$clientLine = "$ipaddress ansible_ssh_user=$ansibleSshUser ansible_ssh_pass=$ansibleSshPass";
 		}
-		$textHostFile = Command::runSudo("ansible-inventory -i {:hostsFilePath} --list --yaml", [
-			'hostsFilePath' =>  $this->hostsFilePath
-		]);
-		$arrayHosts = yaml_parse($textHostFile)["all"]["children"];
 
 		if ($hostsname == 'Grupsuz') {
 			$grupsuz = Command::runSudo(
@@ -133,11 +158,16 @@ class HostsController
 				]
 			);
 		} else {
+			$output =
+				Command::runSudo("cat {:hostsFilePath} | grep -v '^#'", [
+					'hostsFilePath' => $this->hostsFilePath
+				]) . ' [';
+			$output = str_replace("\n", ' ', $output);
 
-			if (array_key_exists($ipaddress, $arrayHosts[$hostsname]["hosts"]) && $arrayHosts[$hostsname]["hosts"][$ipaddress]["ansible_ssh_user"] == $ansibleSshUser) {
+			preg_match("/\[$hostsname\](.*?)(?=\[)/", $output, $hostzone);
+			if (strpos($hostzone[1], $clientLine) !== false) {
 				return respond('Böyle bir client bulunmaktadır.', 201);
 			}
-
 			$output = Command::runSudo(
 				"sh -c \"sed -i '/\[{:hostsname}\]/a {:clientLine}' {:hostsFilePath}\"",
 				[
@@ -196,17 +226,17 @@ class HostsController
 
 		if ($hostsname == 'Grupsuz') {
 			$linenumber = Command::runSudo(
-				"cat {:hostsfilepath} | grep -n -v '^#' | sed -n -e '/\[.*/,/\\$/!p' | grep @{:clientLine} | cut -d ':' -f1",
+				"cat {:hostsFilePath} | grep -n -v '^#' | sed -n -e '/\[.*/,/\\$/!p' | grep @{:clientLine} | cut -d ':' -f1",
 				[
-					'hostsfilepath' => $this->hostsfilepath,
+					'hostsfilepath' => $this->hostsFilePath,
 					'clientLine' => $clientLine
 				]
 			);
 		} else {
 			$linenumber = Command::runSudo(
-				"cat -n {:hostsfilepath} | sed -n -e '/\[{:hostsname}/,/\[/ p' | grep @{:clientLine} | awk '{print $1}'",
+				"cat -n {:hostsFilePath} | sed -n -e '/\[{:hostsname}/,/\[/ p' | grep @{:clientLine} | awk '{print $1}'",
 				[
-					'hostsfilepath' => $this->hostsfilepath,
+					'hostsFilePath' => $this->hostsFilePath,
 					'hostsname' => $hostsname,
 					'clientLine' => $clientLine
 				]
@@ -218,9 +248,9 @@ class HostsController
 		}
 
 		$output = Command::runSudo(
-			"sh -c \"sed -i '{:linenumber} d' {:hostsfilepath}\"",
+			"sh -c \"sed -i '{:linenumber} d' {:hostsFilePath}\"",
 			[
-				'hostsfilepath' => $this->hostsfilepath,
+				'hostsFilePath' => $this->hostsFilePath,
 				'linenumber' => $linenumber
 			]
 		);
