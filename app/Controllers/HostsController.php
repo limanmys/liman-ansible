@@ -11,26 +11,35 @@ class HostsController
 
 	function deleteGroup()
 	{
-		$groupName = request("groupName");
-		$textHostFile = Command::runSudo("ansible-inventory -i {:hostsFilePath} --list --yaml", [
-			'hostsFilePath' =>  $this->hostsFilePath
-		]);
-		$arrayHosts = yaml_parse($textHostFile)["all"]["children"][$groupName];
-		if (!empty($arrayHosts["hosts"])) {
-			return respond("WARNING", 201);
+		$groupName = request('groupName');
+		$textHostFile = Command::runSudo(
+			'ansible-inventory -i {:hostsFilePath} --list --yaml',
+			[
+				'hostsFilePath' => $this->hostsFilePath
+			]
+		);
+		$arrayHosts = yaml_parse($textHostFile)['all']['children'][$groupName];
+		if (!empty($arrayHosts['hosts'])) {
+			return respond('WARNING', 201);
 		}
-		Command::runSudo("sh -c \"sed -i '/\[\s*{:groupName}\s*\]/d' {:hostsFilePath}\"", [
-			'groupName' => $groupName,
-			'hostsFilePath' =>  $this->hostsFilePath
-		]);
-		$textHostFile = Command::runSudo("ansible-inventory -i {:hostsFilePath} --list --yaml", [
-			'hostsFilePath' =>  $this->hostsFilePath
-		]);
-		$checkGroup = yaml_parse($textHostFile)["all"]["children"][$groupName];
+		Command::runSudo(
+			"sh -c \"sed -i '/\[\s*{:groupName}\s*\]/d' {:hostsFilePath}\"",
+			[
+				'groupName' => $groupName,
+				'hostsFilePath' => $this->hostsFilePath
+			]
+		);
+		$textHostFile = Command::runSudo(
+			'ansible-inventory -i {:hostsFilePath} --list --yaml',
+			[
+				'hostsFilePath' => $this->hostsFilePath
+			]
+		);
+		$checkGroup = yaml_parse($textHostFile)['all']['children'][$groupName];
 		if (empty($checkGroup)) {
-			return respond("Silindi", 200);
+			return respond('Silindi', 200);
 		} else {
-			return respond("Silinemedi", 201);
+			return respond('Silinemedi', 201);
 		}
 	}
 
