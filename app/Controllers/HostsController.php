@@ -289,6 +289,14 @@ class HostsController
 				$password = $value['password'];
 			}
 		}
+		$checkKey = (bool) Command::runSudo(
+			'[ -f ~/.ssh/id_rsa.pub ] && echo 1 || echo 0'
+		);
+
+		if (!$checkKey) {
+			return respond("İlk olarak ansible sunucunuzda 'id_rsa.pub' adında ssh key oluşturunuz", 201);
+		}
+
 		$sshKey = Command::runSudo('cat ~/.ssh/id_rsa.pub');
 
 		SSHEngine::init($ipAddress, $username, $password);

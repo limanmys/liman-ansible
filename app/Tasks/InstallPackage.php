@@ -8,7 +8,7 @@ use App\Utils\Task\Task;
 class InstallPackage extends Task
 {
 	protected $description = 'Paket indiriliyor...';
-	protected $command = 'DEBIAN_FRONTEND=noninteractive apt install ansible -qqy';
+	protected $command = 'DEBIAN_FRONTEND=noninteractive apt install ansible sshpass -qqy';
 	protected $sudoRequired = true;
 	protected $control = 'apt install';
 
