@@ -5,7 +5,6 @@ namespace App\Controllers;
 use Liman\Toolkit\Shell\SSHEngine;
 use Liman\Toolkit\Shell\Command;
 
-
 class HostsController
 {
 	protected $hostsFilePath = '/etc/ansible/hosts';
@@ -93,7 +92,7 @@ class HostsController
 				: ($sshUser = trim(explode('=', $lineParts[1])[1]));
 			$data[] = [
 				'ip' => $lineParts[0],
-				'ssh_user' => $sshUser,
+				'ssh_user' => $sshUser
 			];
 		}
 
@@ -292,7 +291,6 @@ class HostsController
 			->pluck('name', 'name')
 			->toArray();
 	}
-
 
 	function addShhKey()
 	{
