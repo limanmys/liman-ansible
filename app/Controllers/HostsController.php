@@ -2,8 +2,9 @@
 
 namespace App\Controllers;
 
-use App\Utils\Command\Command;
-use App\Utils\Command\SSHEngine;
+use Liman\Toolkit\Shell\SSHEngine;
+use Liman\Toolkit\Shell\Command;
+
 
 class HostsController
 {
@@ -59,15 +60,12 @@ class HostsController
 			'title' => ['Host Adı'],
 			'display' => ['name'],
 			'menu' => [
-				'Gör' => [
-					'target' => 'getHostsContent',
-					'icon' => 'fa-eye'
-				],
 				'Sil' => [
 					'target' => 'deleteGroup',
 					'icon' => 'fa-trash'
 				]
-			]
+			],
+			'onclick' => 'getHostsContent'
 		]);
 	}
 
@@ -93,20 +91,16 @@ class HostsController
 			sizeof($lineParts) == 1
 				? ($sshUser = '-')
 				: ($sshUser = trim(explode('=', $lineParts[1])[1]));
-			sizeof($lineParts) == 1
-				? ($sshPass = '-')
-				: ($sshPass = trim(explode('=', $lineParts[2])[1]));
 			$data[] = [
 				'ip' => $lineParts[0],
 				'ssh_user' => $sshUser,
-				'ssh_pass' => $sshPass
 			];
 		}
 
 		return view('table', [
 			'value' => $data,
-			'title' => ['Ip Adresi', 'Ssh Kullanıcı', 'Ssh Şifre'],
-			'display' => ['ip', 'ssh_user', 'ssh_pass'],
+			'title' => ['Ip Adresi', 'Ssh Kullanıcı Adı'],
+			'display' => ['ip', 'ssh_user'],
 			'menu' => [
 				'Ssh Key Ekle' => [
 					'target' => 'openAddSshKeyComponent',
@@ -127,13 +121,14 @@ class HostsController
 	function add()
 	{
 		validate([
-			'ipaddress' => 'required|string'
+			'ipaddress' => 'required|string',
+			'sshUserName' => 'required|string'
 		]);
 
 		$hostsname = request('hostsname');
 		$ipaddress = request('ipaddress');
-		$ansibleSshUser = trim(request('ansibleSshUser'));
-		$ansibleSshPass = trim(request('ansibleSshPass'));
+		$ansibleSshUser = trim(request('sshUserName'));
+		$ansibleSshPass = trim(request('sshUserPass'));
 		if ($ansibleSshUser == '') {
 			$clientLine = $ipaddress;
 		} else {
@@ -229,11 +224,10 @@ class HostsController
 		$hostsname = trim(request('deletehostsname'));
 		$ipaddress = trim(request('ipaddress'));
 		$ansibleSshUser = request('ansibleSshUser');
-		$ansibleSshPass = request('ansibleSshPass');
 		if ($ansibleSshUser == '-') {
 			$clientLine = $ipaddress;
 		} else {
-			$clientLine = "$ipaddress ansible_ssh_user=$ansibleSshUser ansible_ssh_pass=$ansibleSshPass";
+			$clientLine = "$ipaddress ansible_ssh_user=$ansibleSshUser";
 		}
 
 		if ($hostsname == 'Grupsuz') {
@@ -299,42 +293,38 @@ class HostsController
 			->toArray();
 	}
 
+
 	function addShhKey()
 	{
-		$userFilePath = '/etc/ansible/users';
 		$ipAddress = request('ipAddress');
-		$username = request('username');
-		$userFileText = str_replace(
-			"\n",
-			'',
-			Command::runSudo('cat {:userFilePath}', [
-				'userFilePath' => $userFilePath
-			])
-		);
-		$userArray = json_decode($userFileText, true);
-
-		foreach ($userArray as $key => $value) {
-			if ($value['name'] == $username) {
-				$password = $value['password'];
-			}
-		}
+		$sshUserName = request('sshUserName');
+		$sshUserPass = request('sshUserPass');
 		$checkKey = (bool) Command::runSudo(
 			'[ -f ~/.ssh/id_rsa.pub ] && echo 1 || echo 0'
 		);
 
 		if (!$checkKey) {
-			return respond(
-				"İlk olarak ansible sunucunuzda 'id_rsa.pub' adında ssh key oluşturunuz",
-				201
-			);
+			Command::run('mkdir ~/.ssh');
+			Command::run('chmod 700 ~/.ssh');
+			Command::run('ssh-keygen -b 2048 -t rsa -f ~/.ssh/id_rsa -q -N ""');
+		}
+		$sshKey = Command::runSudo('cat ~/.ssh/id_rsa.pub') . "\n";
+
+		SSHEngine::init($ipAddress, $sshUserName, $sshUserPass);
+		Command::bindEngine(SSHEngine::class);
+		$checkDir = (bool) Command::runSudo(
+			'[ -d ~/.ssh ] && echo 1 || echo 0'
+		);
+
+		if (!$checkDir) {
+			Command::run('mkdir ~/.ssh');
+			Command::run('chmod 700 ~/.ssh');
+			Command::run('touch ~/.ssh/authorized_keys');
+			Command::run('chmod 600 ~/.ssh/authorized_keys');
 		}
 
-		$sshKey = Command::runSudo('cat ~/.ssh/id_rsa.pub');
-
-		SSHEngine::init($ipAddress, $username, $password);
-		Command::bindEngine(SSHEngine::class);
-		$sshKeyCheck = Command::runSudo(
-			'cat /home/akbel/.ssh/authorized_keys | grep -e @{:sshKey} 1>/dev/null 2>/dev/null && echo 1 || echo 0',
+		$sshKeyCheck = Command::run(
+			'cat ~/.ssh/authorized_keys | grep -e @{:sshKey} 1>/dev/null 2>/dev/null && echo 1 || echo 0',
 			[
 				'sshKey' => $sshKey
 			]
@@ -356,26 +346,12 @@ class HostsController
 
 	function removeShhKey()
 	{
-		$userFilePath = '/etc/ansible/users';
 		$ipAddress = request('ipAddress');
-		$username = request('username');
-		$userFileText = str_replace(
-			"\n",
-			'',
-			Command::runSudo('cat {:userFilePath}', [
-				'userFilePath' => $userFilePath
-			])
-		);
-		$userArray = json_decode($userFileText, true);
-
-		foreach ($userArray as $key => $value) {
-			if ($value['name'] == $username) {
-				$password = $value['password'];
-			}
-		}
+		$sshUserName = request('sshUserName');
+		$sshUserPass = request('sshUserPass');
 		$sshKey = Command::runSudo('cat ~/.ssh/id_rsa.pub');
 
-		SSHEngine::init($ipAddress, $username, $password);
+		SSHEngine::init($ipAddress, $sshUserName, $sshUserPass);
 		Command::bindEngine(SSHEngine::class);
 
 		Command::runSudo(

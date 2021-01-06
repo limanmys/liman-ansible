@@ -15,10 +15,6 @@ return [
     "remove_ssh_key" => "HostsController@removeShhKey",
     "delete_group" => "HostsController@deleteGroup",
 
-    "get_users" => "UserController@get",
-    "add_user" => "UserController@add",
-    "delete_user" => "UserController@delete",
-
     "get_files" => "FileController@get",
     "get_file_content" => "FileController@getContent",
     "upload_file" => "FileController@upload",

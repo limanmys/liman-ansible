@@ -1,10 +1,3 @@
-@if(server()->type != "ssh")
-    <div class="alert alert-danger" role="alert">
-    {{__("Bu eklentiyi kullanabilmek için anahtarlı bir linux sunucusu gerekmektedir.")}}
-    </div>
-@php(die())@endphp
-@endif
-
 <div class="alert alert-warning" role="alert">
   {{__("Bu sunucuda ansible kurulu değil, hemen kurmak için aşağıdaki butonu kullanabilirsiniz.")}}
 </div>

@@ -1,7 +1,8 @@
 <?php
+
 namespace App\Controllers;
 
-use App\Utils\Task\TaskManager;
+use Liman\Toolkit\RemoteTask\TaskManager;
 
 class TaskController
 {

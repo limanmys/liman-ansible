@@ -1,7 +1,8 @@
 <?php
 
 namespace App\Controllers;
-use App\Utils\Command\Command;
+
+use Liman\Toolkit\Shell\Command;
 
 class PackageController
 {

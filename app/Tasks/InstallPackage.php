@@ -2,13 +2,13 @@
 
 namespace App\Tasks;
 
-use App\Helpers\Formatter;
-use App\Utils\Task\Task;
+use Liman\Toolkit\Formatter;
+use Liman\Toolkit\RemoteTask\Task;
 
 class InstallPackage extends Task
 {
 	protected $description = 'Paket indiriliyor...';
-	protected $command = 'DEBIAN_FRONTEND=noninteractive apt install ansible sshpass -qqy';
+	protected $command = 'DEBIAN_FRONTEND=noninteractive apt install ansible sshpass unzip -qqy';
 	protected $sudoRequired = true;
 	protected $control = 'apt install';
 

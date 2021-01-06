@@ -15,9 +15,6 @@ if (!$checkPackage) {
         <a class="nav-link" onclick="getHosts()" href="#hosts" data-toggle="tab"><i class="fas fa-server mr-2"></i>{{ __('Hosts') }}</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" onclick="getUsers()" href="#users" data-toggle="tab"><i class="fas fa-users mr-2"></i>{{ __('Kullanıcılar') }}</a>
-    </li>
-    <li class="nav-item">
         <a class="nav-link" onclick="getFiles()" href="#files" data-toggle="tab"><i class="fas fa-archive mr-2"></i>{{ __('Dosyalar') }}</a>
     </li>
     <li class="nav-item">
@@ -35,10 +32,6 @@ if (!$checkPackage) {
 
     <div id="hosts" class="tab-pane">
         @include("pages.host")
-    </div>
-
-    <div id="users" class="tab-pane">
-        @include("pages.users")
     </div>
 
     <div id="files" class="tab-pane">

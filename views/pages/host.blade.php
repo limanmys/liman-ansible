@@ -32,8 +32,8 @@
     @include('inputs', [
         "inputs" => [
             "Ip Adresi" => "ipaddress:text:Ip Adresi (Örn : 172.0.0.1)",
-            "Ssh Kullanıcı" => "ansibleSshUser:text:Bağlanılacak makinenin ssh kullanıcı adı",
-            "Ssh Parola" => "ansibleSshPass:password:Bağlanılacak makinenin ssh kullanıcısının şifresi",
+            "Ssh Kullanıcı" => "sshUserName:text:Bağlanılacak makinenin ssh kullanıcı adı",
+            "Ssh Parola" => "sshUserPass:password:Bağlanılacak makinenin ssh kullanıcısının şifresi (isteğe  bağlı)",
         ]
     ])
 @endcomponent
@@ -60,7 +60,8 @@
 ])
     @include('inputs', [
         "inputs" => [
-            "Kullanıcılar:user" => \App\Controllers\HostsController::getUserSelect(),
+            "Eklenecek makinenin local kullanıcısı" => "sshUserName:text:pardus",
+            "Eklenecek makinenin local kullanıcısının şifresi" => "sshUserPass:password:1",
             "ipaddress:ipaddress" => "ipaddress:hidden",
         ]
     ])
@@ -77,7 +78,8 @@
 ])
     @include('inputs', [
         "inputs" => [
-            "Kullanıcılar:user" => \App\Controllers\HostsController::getUserSelect(),
+             "Eklenecek makinenin local kullanıcısı" => "sshUserName:text:pardus",
+            "Eklenecek makinenin local kullanıcısının şifresi" => "sshUserPass:password:1",
             "ipaddress:ipaddress" => "ipaddress:hidden",
         ]
     ])
@@ -85,8 +87,6 @@
 
 
 <script>
-    $('#addGroupModal').find('input[name=ansibleSshUser]').removeAttr('required');
-    $('#addGroupModal').find('input[name=ansibleSshPass]').removeAttr('required');
     let HOSTNAME =  ""
 
     function deleteGroup(line){
@@ -128,9 +128,11 @@
     function addSshKey(){
         showSwal('{{__("Ekleniyor..")}}','info');
         let ipAddress = $('#addSshKeyComponent').find('input[name=ipaddress]').val();
-        let username = $('#addSshKeyComponent').find('select[name=user]').val();
+        let sshUserName = $('#addSshKeyComponent').find('input[name=sshUserName]').val();
+        let sshUserPass = $('#addSshKeyComponent').find('input[name=sshUserPass]').val();
         let formData = new FormData();
-        formData.append("username",username)
+        formData.append("sshUserName",sshUserName)
+        formData.append("sshUserPass",sshUserPass)
         formData.append("ipAddress",ipAddress)
         request(API("add_ssh_key") ,formData,function(response){
             $('#addSshKeyComponent').modal("hide");
@@ -150,9 +152,11 @@
     function removeSshKey(){
         showSwal('{{__("Kaldırılıyor..")}}','info');
         let ipAddress = $('#removeSshKeyComponent').find('input[name=ipaddress]').val();
-        let username = $('#removeSshKeyComponent').find('select[name=user]').val();
+        let sshUserName = $('#removeSshKeyComponent').find('input[name=sshUserName]').val();
+        let sshUserPass = $('#removeSshKeyComponent').find('input[name=sshUserPass]').val();
         let formData = new FormData();
-        formData.append("username",username)
+        formData.append("sshUserName",sshUserName)
+        formData.append("sshUserPass",sshUserPass)
         formData.append("ipAddress",ipAddress)
         request(API("remove_ssh_key") ,formData,function(response){
             $('#removeSshKeyComponent').modal("hide");
@@ -173,19 +177,19 @@
         showSwal('{{__("Ekleniyor..")}}','info');
         let formData = new FormData();
         let ip = $('#addClientIpModal').find('input[name=ipaddress]').val();
-        let user = $('#addClientIpModal').find('input[name=ansibleSshUser]').val();
-        let pass = $('#addClientIpModal').find('input[name=ansibleSshPass]').val();
+        let user = $('#addClientIpModal').find('input[name=sshUserName]').val();
+        let pass = $('#addClientIpModal').find('input[name=sshUserPass]').val();
         formData.append("hostsname",HOSTNAME)
         formData.append("ipaddress",ip)
-        formData.append("ansibleSshUser",user)
-        formData.append("ansibleSshPass",pass)
+        formData.append("sshUserName",user)
+        formData.append("sshUserPass",pass)
         request(API("add_host") ,formData,function(response){
             showSwal('{{__("Eklendi")}}', 'success',2000);
             reloadModalTable();
         }, function(response){
             let error = JSON.parse(response);
             showSwal(error.message, 'error');
-        });
+        }); 
     }
 
     function deleteClientIpJS(line){
@@ -204,10 +208,8 @@
                 let formData = new FormData();
                 let ip = line.querySelector("#ip").innerHTML;
                 let ansibleSshUser = line.querySelector("#ssh_user").innerHTML;
-                let ansibleSshPass = line.querySelector("#ssh_pass").innerHTML;
                 formData.append("deletehostsname",HOSTNAME);
                 formData.append("ansibleSshUser",ansibleSshUser);
-                formData.append("ansibleSshPass",ansibleSshPass);
                 formData.append("ipaddress",ip);
                 request(API("delete_ip") ,formData,function(response){
                     showSwal('{{__("Silindi")}}', 'success',2000);
