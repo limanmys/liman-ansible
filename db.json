@@ -1,7 +1,7 @@
 {
     "name": "Ansible",
     "publisher": "Administrator",
-    "version": "0.24",
+    "version": "0.25",
     "database": [],
     "widgets": [],
     "views": [
@@ -20,5 +20,5 @@
     "verification": null,
     "dependencies": "php7.3-yaml",
     "sslPorts": null,
-    "version_code": 7
+    "version_code": 9
 }

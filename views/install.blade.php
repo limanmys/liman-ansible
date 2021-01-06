@@ -1,8 +1,8 @@
-<div class="alert alert-warning" role="alert">
-  {{__("Bu sunucuda ansible kurulu değil, hemen kurmak için aşağıdaki butonu kullanabilirsiniz.")}}
+<div class="alert alert-info" role="alert">
+  <i class="fas fa-info-circle mr-2"></i>{{__("Eklentiyi kullanabilmek için gerekli paketleri sunucuya kurmanız gerekmektedir. Aşağıdaki butonu kullanarak kurulumu gerçekleştirebilirsiniz.")}}
 </div>
 
-<button id="installButton" class="btn btn-secondary" onclick="startInstallation()">{{__("Ansible paketini depodan kur.")}}</button>
+<button id="installButton" class="btn btn-secondary" onclick="startInstallation()">{{__("Paketleri depodan kur.")}}</button>
 
 @component('modal-component',[
     "id" => "taskModal",
