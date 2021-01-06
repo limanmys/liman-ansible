@@ -18,4 +18,4 @@ Kurulacak olan paketler ;
 
 Playbook kısmında playbook oluşturup sağ tık ile çalıştır diyerek grup seçebilirsiniz. Ardından playbook client makinelerde çalışmaya başlamaktadır. Playbook çıktısını log olarak isteğe bağlık şekilde kaydedebilirsiniz.
 
-![Playbook Çıktısı](https://github.com/limanmys/liman-ansible/blob/master/screenshots/playbook-output.png)
+![Playbook Çıktısı](https://github.com/limanmys/liman-ansible/blob/master/screenshots/playbook-output-image.png)
