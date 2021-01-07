@@ -4,6 +4,7 @@ namespace App\Tasks;
 
 use Liman\Toolkit\Formatter;
 use Liman\Toolkit\RemoteTask\Task;
+use Liman\Toolkit\Shell\Command;
 
 class InstallPackage extends Task
 {
@@ -26,7 +27,6 @@ class InstallPackage extends Task
 
 	protected function after()
 	{
-		//example
-		//dd($this->attributes);
+		Command::runSudo("sed -i '/\[defaults\]/a host_key_checking = False' /etc/ansible/ansible.cfg"); //Fingerprint check off
 	}
 }

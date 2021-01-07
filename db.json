@@ -1,7 +1,7 @@
 {
     "name": "Ansible",
     "publisher": "Administrator",
-    "version": "0.25",
+    "version": "0.26",
     "database": [],
     "widgets": [],
     "views": [
@@ -12,7 +12,7 @@
     ],
     "language": "php",
     "status": 0,
-    "service": null,
+    "service": "22",
     "supportedLiman": "1.4.0",
     "support": "administrator@liman.dev",
     "icon": "fas fa-play",
@@ -20,5 +20,5 @@
     "verification": null,
     "dependencies": "php7.3-yaml",
     "sslPorts": null,
-    "version_code": 9
+    "version_code": 11
 }
