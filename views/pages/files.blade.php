@@ -39,7 +39,7 @@
                 showSwal('{{__("Güncelleniyor..")}}','info');
                 let data = new FormData();
                 let text = $('#textDiv').val()
-                let filePath = $("#fileTree").jstree("get_selected",true)[0]["original"]["text"];
+                let filePath = $("#fileTree").jstree("get_selected",true)[0]["original"]["id"];
                 data.append("filePath",filePath)
                 data.append("text",text)
                 request(API('edit_file'), data, function(res) {

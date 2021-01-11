@@ -60,8 +60,8 @@
 ])
     @include('inputs', [
         "inputs" => [
-            "Eklenecek makinenin local kullanıcısı" => "sshUserName:text:pardus",
-            "Eklenecek makinenin local kullanıcısının şifresi" => "sshUserPass:password:1",
+            "Eklenecek makinenin local kullanıcısı" => "sshUserName:text:Kullanıcı Adı",
+            "Eklenecek makinenin local kullanıcısının şifresi" => "sshUserPass:password:Kullanıcı Parolası",
             "ipaddress:ipaddress" => "ipaddress:hidden",
         ]
     ])
