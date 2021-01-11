@@ -90,17 +90,19 @@ class HostsController
 			sizeof($lineParts) == 1
 				? ($sshUser = '-')
 				: ($sshUser = trim(explode('=', $lineParts[1])[1]));
+			if (strpos($line, "ansible_ssh_pass") !== false) {
+				$type = "Parola";
+			} else {
+				$type = "SSH Key";
+			}
 			$data[] = [
 				'ip' => $lineParts[0],
-				'ssh_user' => $sshUser
+				'ssh_user' => $sshUser,
+				'type' => $type
 			];
 		}
-
-		return view('table', [
-			'value' => $data,
-			'title' => ['Ip Adresi', 'Ssh Kullanıcı Adı'],
-			'display' => ['ip', 'ssh_user'],
-			'menu' => [
+		$menuArray =
+			[
 				'Ssh Key Ekle' => [
 					'target' => 'openAddSshKeyComponent',
 					'icon' => 'fa-plus'
@@ -113,7 +115,13 @@ class HostsController
 					'target' => 'deleteClientIpJS',
 					'icon' => 'fa-trash'
 				]
-			]
+			];
+
+		return view('table', [
+			'value' => $data,
+			'title' => ['Ip Adresi', 'Ssh Kullanıcı Adı', 'Tip'],
+			'display' => ['ip', 'ssh_user', 'type'],
+			'menu' => $menuArray
 		]);
 	}
 
@@ -121,17 +129,21 @@ class HostsController
 	{
 		validate([
 			'ipaddress' => 'required|string',
-			'sshUserName' => 'required|string'
+			'sshUserName' => 'required|string',
+			'sshUserPass' => 'required|string',
+			'type' => 'required|string'
 		]);
 
 		$hostsname = request('hostsname');
 		$ipaddress = request('ipaddress');
-		$ansibleSshUser = trim(request('sshUserName'));
-		$ansibleSshPass = trim(request('sshUserPass'));
-		if ($ansibleSshUser == '') {
-			$clientLine = $ipaddress;
+		$sshUserName = trim(request('sshUserName'));
+		$sshUserPass = trim(request('sshUserPass'));
+		$type = trim(request('type'));
+
+		if ($type == "password") {
+			$clientLine = "$ipaddress ansible_ssh_user=$sshUserName ansible_ssh_pass=$sshUserPass";
 		} else {
-			$clientLine = "$ipaddress ansible_ssh_user=$ansibleSshUser ansible_ssh_pass=$ansibleSshPass";
+			$clientLine = "$ipaddress ansible_ssh_user=$sshUserName";
 		}
 
 		if ($hostsname == 'Grupsuz') {
@@ -168,7 +180,7 @@ class HostsController
 			$output = str_replace("\n", ' ', $output);
 
 			preg_match("/\[$hostsname\](.*?)(?=\[)/", $output, $hostzone);
-			if (strpos($hostzone[1], $clientLine) !== false) {
+			if (strpos($hostzone[1], $ipaddress) !== false) {
 				return respond('Böyle bir client bulunmaktadır.', 201);
 			}
 			$output = Command::runSudo(
@@ -180,8 +192,15 @@ class HostsController
 				]
 			);
 		}
-		if (trim($output) == '') {
-			return respond('Başarıyla Eklendi', 200);
+		if (trim($output) == '' && $type == "sshkey") {
+			$sshKeyOutput = $this->addShhKey($ipaddress, $sshUserName, $sshUserPass);
+			if ($sshKeyOutput == "OK") {
+				return respond("Client eklendi", 200);
+			} else {
+				return respond($output, 201);
+			}
+		} else if (trim($output) == '' && $type == "password") {
+			return respond("Client eklendi", 200);
 		} else {
 			return respond($output, 201);
 		}
@@ -292,11 +311,21 @@ class HostsController
 			->toArray();
 	}
 
-	function addShhKey()
+	function addSshKeyRequest()
 	{
-		$ipAddress = request('ipAddress');
-		$sshUserName = request('sshUserName');
-		$sshUserPass = request('sshUserPass');
+		$ipAddress = request("ipAddress");
+		$sshUserName = request("sshUserName");
+		$sshUserPass = request("sshUserPass");
+		$sshKeyOutput = $this->addShhKey($ipAddress, $sshUserName, $sshUserPass);
+		if ($sshKeyOutput == "OK") {
+			return respond("Key eklendi", 200);
+		} else {
+			return respond($sshKeyOutput, 201);
+		}
+	}
+
+	function addShhKey($ipAddress, $sshUserName, $sshUserPass)
+	{
 		$checkKey = (bool) Command::runSudo(
 			'[ -f ~/.ssh/id_rsa.pub ] && echo 1 || echo 0'
 		);
@@ -339,7 +368,7 @@ class HostsController
 			]
 		);
 
-		return respond('Eklendi', 200);
+		return "OK";
 	}
 
 	function removeShhKey()

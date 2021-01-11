@@ -12,6 +12,7 @@ return [
     "delete_ip" => "HostsController@delete",
     "get_host_content" => "HostsController@getContent",
     "add_ssh_key" => "HostsController@addShhKey",
+    "add_ssh_key_request" => "HostsController@addSshKeyRequest",
     "remove_ssh_key" => "HostsController@removeShhKey",
     "delete_group" => "HostsController@deleteGroup",
 

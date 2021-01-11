@@ -33,7 +33,11 @@
         "inputs" => [
             "Ip Adresi" => "ipaddress:text:Ip Adresi (Örn : 172.0.0.1)",
             "Ssh Kullanıcı" => "sshUserName:text:Bağlanılacak makinenin ssh kullanıcı adı",
-            "Ssh Parola" => "sshUserPass:password:Bağlanılacak makinenin ssh kullanıcısının şifresi (isteğe  bağlı)",
+            "Ekleme Yöntemi:type" => [
+                "Parola" => "password",
+                "SSH Anahtarı" => "sshkey"
+            ],
+            "Bağlanılacak makinenin ssh şifresi" => "sshUserPass:password:Bağlanılacak makinenin ssh şifresi",
         ]
     ])
 @endcomponent
@@ -78,8 +82,8 @@
 ])
     @include('inputs', [
         "inputs" => [
-             "Eklenecek makinenin local kullanıcısı" => "sshUserName:text:pardus",
-            "Eklenecek makinenin local kullanıcısının şifresi" => "sshUserPass:password:1",
+             "Eklenecek makinenin local kullanıcısı" => "sshUserName:text:Kullanıcı Adı",
+            "Eklenecek makinenin local kullanıcısının şifresi" => "sshUserPass:password:Kullanıcı Parolası",
             "ipaddress:ipaddress" => "ipaddress:hidden",
         ]
     ])
@@ -134,7 +138,7 @@
         formData.append("sshUserName",sshUserName)
         formData.append("sshUserPass",sshUserPass)
         formData.append("ipAddress",ipAddress)
-        request(API("add_ssh_key") ,formData,function(response){
+        request(API("add_ssh_key_request") ,formData,function(response){
             $('#addSshKeyComponent').modal("hide");
             showSwal('{{__("Eklendi")}}', 'success',2000);
         }, function(response){
@@ -177,12 +181,14 @@
         showSwal('{{__("Ekleniyor..")}}','info');
         let formData = new FormData();
         let ip = $('#addClientIpModal').find('input[name=ipaddress]').val();
+        let type = $('#addClientIpModal').find('select[name=type]').val();
         let user = $('#addClientIpModal').find('input[name=sshUserName]').val();
         let pass = $('#addClientIpModal').find('input[name=sshUserPass]').val();
         formData.append("hostsname",HOSTNAME)
         formData.append("ipaddress",ip)
         formData.append("sshUserName",user)
         formData.append("sshUserPass",pass)
+        formData.append("type",type)
         request(API("add_host") ,formData,function(response){
             showSwal('{{__("Eklendi")}}', 'success',2000);
             reloadModalTable();
