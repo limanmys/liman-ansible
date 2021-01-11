@@ -90,10 +90,10 @@ class HostsController
 			sizeof($lineParts) == 1
 				? ($sshUser = '-')
 				: ($sshUser = trim(explode('=', $lineParts[1])[1]));
-			if (strpos($line, "ansible_ssh_pass") !== false) {
-				$type = "Parola";
+			if (strpos($line, 'ansible_ssh_pass') !== false) {
+				$type = 'Parola';
 			} else {
-				$type = "SSH Key";
+				$type = 'SSH Key';
 			}
 			$data[] = [
 				'ip' => $lineParts[0],
@@ -101,21 +101,20 @@ class HostsController
 				'type' => $type
 			];
 		}
-		$menuArray =
-			[
-				'Ssh Key Ekle' => [
-					'target' => 'openAddSshKeyComponent',
-					'icon' => 'fa-plus'
-				],
-				'Ssh Key Kaldır' => [
-					'target' => 'openRemoveSshKeyComponent',
-					'icon' => 'fa-times-circle'
-				],
-				'Sil' => [
-					'target' => 'deleteClientIpJS',
-					'icon' => 'fa-trash'
-				]
-			];
+		$menuArray = [
+			'Ssh Key Ekle' => [
+				'target' => 'openAddSshKeyComponent',
+				'icon' => 'fa-plus'
+			],
+			'Ssh Key Kaldır' => [
+				'target' => 'openRemoveSshKeyComponent',
+				'icon' => 'fa-times-circle'
+			],
+			'Sil' => [
+				'target' => 'deleteClientIpJS',
+				'icon' => 'fa-trash'
+			]
+		];
 
 		return view('table', [
 			'value' => $data,
@@ -140,7 +139,7 @@ class HostsController
 		$sshUserPass = trim(request('sshUserPass'));
 		$type = trim(request('type'));
 
-		if ($type == "password") {
+		if ($type == 'password') {
 			$clientLine = "$ipaddress ansible_ssh_user=$sshUserName ansible_ssh_pass=$sshUserPass";
 		} else {
 			$clientLine = "$ipaddress ansible_ssh_user=$sshUserName";
@@ -192,15 +191,19 @@ class HostsController
 				]
 			);
 		}
-		if (trim($output) == '' && $type == "sshkey") {
-			$sshKeyOutput = $this->addShhKey($ipaddress, $sshUserName, $sshUserPass);
-			if ($sshKeyOutput == "OK") {
-				return respond("Client eklendi", 200);
+		if (trim($output) == '' && $type == 'sshkey') {
+			$sshKeyOutput = $this->addShhKey(
+				$ipaddress,
+				$sshUserName,
+				$sshUserPass
+			);
+			if ($sshKeyOutput == 'OK') {
+				return respond('Client eklendi', 200);
 			} else {
 				return respond($output, 201);
 			}
-		} else if (trim($output) == '' && $type == "password") {
-			return respond("Client eklendi", 200);
+		} elseif (trim($output) == '' && $type == 'password') {
+			return respond('Client eklendi', 200);
 		} else {
 			return respond($output, 201);
 		}
@@ -313,12 +316,16 @@ class HostsController
 
 	function addSshKeyRequest()
 	{
-		$ipAddress = request("ipAddress");
-		$sshUserName = request("sshUserName");
-		$sshUserPass = request("sshUserPass");
-		$sshKeyOutput = $this->addShhKey($ipAddress, $sshUserName, $sshUserPass);
-		if ($sshKeyOutput == "OK") {
-			return respond("Key eklendi", 200);
+		$ipAddress = request('ipAddress');
+		$sshUserName = request('sshUserName');
+		$sshUserPass = request('sshUserPass');
+		$sshKeyOutput = $this->addShhKey(
+			$ipAddress,
+			$sshUserName,
+			$sshUserPass
+		);
+		if ($sshKeyOutput == 'OK') {
+			return respond('Key eklendi', 200);
 		} else {
 			return respond($sshKeyOutput, 201);
 		}
@@ -368,7 +375,7 @@ class HostsController
 			]
 		);
 
-		return "OK";
+		return 'OK';
 	}
 
 	function removeShhKey()
