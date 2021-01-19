@@ -31,6 +31,12 @@ return [
     "run_playbook" => "PlaybookController@run",
     "playbook_save_output" => "PlaybookController@saveLog",
 
+    "get_templates" => "TemplateController@get",
+    "create_template" => "TemplateController@create",
+    "delete_template" => "TemplateController@delete",
+    "get_content_template" => "TemplateController@getContent",
+    "edit_template" => "TemplateController@edit",
+
     "runTask" => "TaskController@runTask",
     "checkTask" => "TaskController@checkTask",
 

@@ -21,6 +21,9 @@ if (!$checkPackage) {
         <a class="nav-link" onclick="getPlaybooks()" href="#playbooks" data-toggle="tab"><i class="far fa-play-circle mr-2"></i>{{ __('Playbook') }}</a>
     </li>
     <li class="nav-item">
+        <a class="nav-link" onclick="getTemplates()" href="#templates" data-toggle="tab"><i class="fas fa-file-code mr-2"></i>{{ __('Template') }}</a>
+    </li>
+    <li class="nav-item">
         <a class="nav-link" onclick="getLogs()" href="#logs" data-toggle="tab"><i class="fas fa-file-alt mr-2"></i>{{ __('Loglar') }}</a>
     </li>
 </ul>
@@ -40,6 +43,10 @@ if (!$checkPackage) {
 
     <div id="playbooks" class="tab-pane">
         @include("pages.playbook")
+    </div>
+
+    <div id="templates" class="tab-pane">
+        @include("pages.templates")
     </div>
 
     <div id="logs" class="tab-pane">
