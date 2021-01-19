@@ -23,7 +23,7 @@ class TemplateController
 			$fileJson = collect($fileArray)->map(function ($i) {
 				return [
 					'name' => $i,
-					'path' => "/var/templates/" . $i
+					'path' => '/var/templates/' . $i
 				];
 			}, $fileArray);
 		}
