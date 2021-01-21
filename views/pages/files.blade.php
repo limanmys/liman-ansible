@@ -16,6 +16,7 @@
     ])
     @include('file-input', [
         'title' => 'Dosya Yükle',
+        'id' => 'test',
         'name' => 'file_upload',
         'callback' => 'onSuccess'
     ])
@@ -23,7 +24,20 @@
 <div id="filesDiv"></div>
 
 <script>
-
+    $('#test-upload-file').change(function () {
+        let fileName = $("#fileUpload [name='file_upload']").val()
+        let allowExtension = ["gz", "zip", "tar"];
+        extension = fileName.split('.').pop();
+        if(allowExtension.indexOf(extension) == "-1"){
+            $("#fileUpload [name='file_upload']").val("")
+            Swal.fire({
+                type: 'error',
+                title: 'Yanlış Format...',
+                text: 'Dosya formatı zip, tar.gz veya tar uzantılı olabilir.',
+            })
+        }
+    }); 
+    
     function editFile(){
         Swal.fire({
             title: "{{ __('Onay') }}",
