@@ -14,17 +14,17 @@ class InstallPackage extends Task
 
 	public function __construct(array $attributes = [])
 	{
-		$this->control = Distro::debian(
-			'apt install'
-		)->centos(
-			'yum install'
-		)->get();
+		$this->control = Distro::debian('apt install')
+			->centos('yum install')
+			->get();
 
 		$this->command = Distro::debian(
 			'DEBIAN_FRONTEND=noninteractive apt install ansible sshpass unzip -qqy'
-		)->centos(
-			'yum install -y epel-release sshpass unzip; yum install -y ansible'
-		)->get();
+		)
+			->centos(
+				'yum install -y epel-release sshpass unzip; yum install -y ansible'
+			)
+			->get();
 
 		$this->attributes = $attributes;
 		$this->logFile = Formatter::run('/tmp/apt-install-ansible.txt');
