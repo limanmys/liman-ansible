@@ -2,19 +2,21 @@
 
 namespace App\Controllers;
 
-use Liman\Toolkit\Shell\Command;
+use Liman\Toolkit\OS\Distro;
 
 class PackageController
 {
 	public static function verifyInstallation()
 	{
-		if (
-			trim(
-				Command::runSudo(
-					'dpkg -s ansible | grep "Status" | grep -w "install" 1>/dev/null 2>/dev/null && echo "1" || echo "0"'
-				)
-			) == '1'
-		) {
+		$checkAnsible = (bool) Distro::debian(
+			"dpkg --get-selections | grep -v deinstall | awk '{print $1}' |  grep '^ansible$' 2>/dev/null  1>/dev/null && echo 1 || echo 0"
+		)
+			->centos(
+				"rpm -qa | grep '^ansible'  2>/dev/null  1>/dev/null && echo 1 || echo 0"
+			)
+			->runSudo();
+
+		if ($checkAnsible) {
 			return true;
 		} else {
 			return false;

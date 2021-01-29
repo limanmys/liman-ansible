@@ -3,18 +3,29 @@
 namespace App\Tasks;
 
 use Liman\Toolkit\Formatter;
+use Liman\Toolkit\OS\Distro;
 use Liman\Toolkit\RemoteTask\Task;
 use Liman\Toolkit\Shell\Command;
 
 class InstallPackage extends Task
 {
 	protected $description = 'Paket indiriliyor...';
-	protected $command = 'DEBIAN_FRONTEND=noninteractive apt install ansible sshpass unzip -qqy';
 	protected $sudoRequired = true;
-	protected $control = 'apt install';
 
 	public function __construct(array $attributes = [])
 	{
+		$this->control = Distro::debian(
+			'apt install'
+		)->centos(
+			'yum install'
+		)->get();
+
+		$this->command = Distro::debian(
+			'DEBIAN_FRONTEND=noninteractive apt install ansible sshpass unzip -qqy'
+		)->centos(
+			'yum install -y epel-release sshpass unzip; yum install -y ansible'
+		)->get();
+
 		$this->attributes = $attributes;
 		$this->logFile = Formatter::run('/tmp/apt-install-ansible.txt');
 	}
@@ -27,8 +38,9 @@ class InstallPackage extends Task
 
 	protected function after()
 	{
+		//Fingerprint check off
 		Command::runSudo(
 			"sed -i '/\[defaults\]/a host_key_checking = False' /etc/ansible/ansible.cfg"
-		); //Fingerprint check off
+		);
 	}
 }
