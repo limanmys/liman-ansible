@@ -27,7 +27,9 @@ class RunPlaybook extends Task
 
 	protected function before()
 	{
-		$checkFinger = (bool) Command::runSudo("cat /etc/ansible/ansible.cfg | grep '^\s*host_key_checking\s*=\s*False' 2>/dev/null  1>/dev/null && echo 1 || echo 0");
+		$checkFinger = (bool) Command::runSudo(
+			"cat /etc/ansible/ansible.cfg | grep '^\s*host_key_checking\s*=\s*False' 2>/dev/null  1>/dev/null && echo 1 || echo 0"
+		);
 		//Fingerprint check off
 		if (!$checkFinger) {
 			Command::runSudo(
