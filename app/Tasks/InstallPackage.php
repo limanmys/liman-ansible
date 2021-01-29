@@ -38,9 +38,7 @@ class InstallPackage extends Task
 
 	protected function after()
 	{
-		//Fingerprint check off
-		Command::runSudo(
-			"sed -i '/\[defaults\]/a host_key_checking = False' /etc/ansible/ansible.cfg"
-		);
+		//example
+		//dd($this->attributes);
 	}
 }
