@@ -63,7 +63,7 @@ class TemplateController
 		$fileName = request('fileName');
 		$fileContent = request('fileContent');
 
-		if (!ctype_alnum($fileName)) {
+		if (!preg_match('/^[a-z0-9-.]+$/', $fileName)) {
 			return respond(
 				'Dosya ismi geçersizdir (Türkçe karakter, özel karakter veya boşluk içermemelidir).',
 				201
