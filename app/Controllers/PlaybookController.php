@@ -28,6 +28,7 @@ class PlaybookController
 			'value' => $fileJson,
 			'title' => ['Dosya Adı'],
 			'display' => ['name'],
+			'onclick' => 'openRunPlaybookComponent',
 			'menu' => [
 				'Gör' => [
 					'target' => 'showPlaybookContent',

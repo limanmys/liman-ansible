@@ -16,11 +16,11 @@ class FileController
 
 	function getContent()
 	{
-		$filePath = request('filepath');
-		$output = Command::runSudo('cat {:filePath} | base64', [
+		$filePath = request('filePath');
+		$output = Command::runSudo('cat {:filePath}', [
 			'filePath' => $filePath
 		]);
-		return respond(base64_decode($output), 200);
+		return $output;
 	}
 
 	function upload()

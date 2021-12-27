@@ -72,24 +72,8 @@
             types : types,
         })
     }
-
-    
     $('#fileTree').on('changed.jstree', function (event, data) {
-        $('#textDiv').val("")
-        filepath = data["node"]["id"];
-        filetype =data["node"]["type"];
-        if(filetype == "file"){
-            $("#fileEditButton").removeAttr('disabled');
-            showSwal('{{__("Yükleniyor...")}}','info');
-            var fileform = new FormData();
-            fileform.append("filepath",filepath)
-            request("{{API('get_file_content')}}", fileform, function(res) {
-                output = JSON.parse(res)["message"]
-                $('#textDiv').val(output);
-                Swal.close();
-            }, function(error) {});
-        }else{
-            $("#fileEditButton").attr('disabled','disabled');
-        }
+        getFileContent(data);
     });
+
 </script>
