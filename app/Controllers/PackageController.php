@@ -22,6 +22,7 @@ class PackageController
 			return false;
 		}
 	}
+	
 	function install()
 	{
 		return respond(
