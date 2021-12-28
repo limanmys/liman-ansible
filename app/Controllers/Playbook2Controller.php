@@ -31,20 +31,10 @@ class Playbook2Controller
 		]);
 
 		$output = Command::run('cat /var/playbooks2/test.txt');
-		
-		$fileJson = [];
-        if ($output != '') {
-           	$fileArray = explode("\n", $output);
-           	$fileJson = collect($fileArray)->map(function ($i) {
-               	return ['name' => $i];
-           	}, $fileArray);
-        }
-		
-        return view('table', [
-           	"value" => $fileJson,
-           	"title" => ["Value"],
-           	"display" => ["name"],
-        ]);	
+		if($output!="")
+			return $output;
+		else
+			return respond('Hatalı sudo şifresi veya hatalı playbook)', 201);
     }
 	
 	public function saveLog()

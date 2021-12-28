@@ -2,22 +2,7 @@
     <i class="far fa-play-circle mr-2"></i> {{ __('Çalıştır') }}
 </button>
 
-@component("modal-component", [
-    "id" => "getModalWindow",
-    "title" => "",
-    "notSized" => true,
-    "modalDialogClasses" => "exClass",
-    "footer" => [
-        "class" => "btn-primary",
-        "onclick" => "saveLogPlaybook()",
-        "text" => "Kaydet"
-]
-])    
-    <div id="outTable"></div>
-
-@endcomponent
 <br>
-
 
 <select id="dropdown1" style="width:232px;">
 </select>
@@ -26,9 +11,16 @@
     
 <input type="password" name="sudoPassword" id="sudopass_field" class="container-sm"
 placeholder="Sudo şifresini giriniz">
+<br><br>
+
+<div class="col" id="fileTextDiv2">
+    <textarea style="width:100%;height: 80%; min-height: 400px;" id="textDiv2"></textarea>
+    <button  class="btn btn-primary mb-2 float-right" id="fileEditButton" onclick="saveLogPlaybook()">
+        <i class="fas fa-edit" ></i> {{ __('Dosya Güncelle') }}
+    </button>
+</div>
 
 <script>
-    
     function getPlaybooks2(){
         let form = new FormData();
         showSwal('{{__("Yükleniyor...")}}','info');
@@ -56,7 +48,6 @@ placeholder="Sudo şifresini giriniz">
 
     function showModal() {
         showSwal('{{__("Yükleniyor...")}}','info');
-        $('#getModalWindow').modal("show");
         let data = new FormData();
 
         var e = document.getElementById("dropdown1");
@@ -67,9 +58,10 @@ placeholder="Sudo şifresini giriniz">
         data.append('sudopass',sudopass);
         
         request(API("list_hosts"), data, function(response) {
-            $("#outTable").html(response).find("table").dataTable(dataTablePresets("normal"));    
+            $("#textDiv2").html(response);   
             Swal.close();  
         }, function(response) {
+            $("#textDiv2").html("");
             let error = JSON.parse(response);
             showSwal(error.message, 'error', 3000);
         });

@@ -22,7 +22,7 @@ class PackageController
 			return false;
 		}
 	}
-	
+
 	function install()
 	{
 		return respond(
@@ -31,7 +31,7 @@ class PackageController
 				'onSuccess' => 'onTaskSuccess',
 				'tasks' => [
 					0 => [
-						'name' => 'InstallPackage',
+						'name' => 'InstallPackage',					
 						'attributes' => []
 					]
 				]
