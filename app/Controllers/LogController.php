@@ -14,7 +14,7 @@ class LogController
 		$data = [];
 		if ($checkDirectory == '1') {
 			$filenames = Command::run(
-				"ls -lh /var/playbook-logs| grep '^-' | awk '{print $5,$6,$7,$8,$9}'"
+				"ls -lh /var/playbook-logs| grep '^-' | awk '{print $5,$6,$7,$8,$9,$4}'"
 			);
 			$filenamesArray = explode("\n", trim($filenames));
 			foreach ($filenamesArray as $value) {
@@ -23,8 +23,9 @@ class LogController
 				}
 				$itemArray = explode(' ', trim($value));
 				$item = [
-					'name' => end($itemArray),
+					'name' => $itemArray[4],
 					'size' => $itemArray[0],
+					'user' => $itemArray[5],
 					'date' => join('-', [
 						$itemArray[1],
 						$itemArray[2],
@@ -36,8 +37,8 @@ class LogController
 		}
 		return view('table', [
 			'value' => $data,
-			'title' => ['Dosya Adı', 'Boyut', 'Tarih'],
-			'display' => ['name', 'size', 'date'],
+			'title' => ['Dosya Adı', 'Boyut', 'Kullanıcı', 'Tarih'],
+			'display' => ['name', 'size', 'user', 'date'],
 			'menu' => [
 				'Gör' => [
 					'target' => 'showLogContent',

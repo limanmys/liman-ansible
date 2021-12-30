@@ -44,8 +44,11 @@ return [
     "get_content_log" => "LogController@getContent",
     "delete_log" => "LogController@delete",
 
-    "list_hosts" => "Playbook2Controller@listHosts",
-    "playbook2_save_output" => "Playbook2Controller@saveLog",
-    "get_playbooks2" => "Playbook2Controller@get"
+    "get_log2" => "Playbook2Controller@getLog2",
+    "get_content_log2" => "Playbook2Controller@getContent2",
+    "delete_log2" => "Playbook2Controller@delete2",
+    "run_playbook2" => "Playbook2Controller@runPlaybook2",
+    "playbook2_save_output" => "Playbook2Controller@saveLog2",
+    "get_playbooks2" => "Playbook2Controller@get2"
 
 ];

@@ -1,4 +1,4 @@
-<div id="logTable"></div>
+<div id="logTable2"></div>
 
 @component('modal-component',[
     "id" => "showLogContentComponent",
@@ -10,7 +10,7 @@
         let form = new FormData();
         showSwal('{{__("Yükleniyor...")}}','info');
         request(API('get_logs'), form, function(response) {
-            $('#logTable').html(response).find('table').DataTable(dataTablePresets('normal'));
+            $('#logTable2').html(response).find('table').DataTable(dataTablePresets('normal'));
             Swal.close();
         }, function(error) {
             error = JSON.parse(error)["message"]
@@ -20,12 +20,14 @@
 
     function showLogContent(line){
         let fileName = line.querySelector("#name").innerHTML;
-        let formData = new FormData()
+        let formData = new FormData();
+        //console.log(line.querySelector("#name").innerHTML);
         formData.append("fileName",fileName);
         request(API("get_content_log"), formData, function(response){
             let filecontent = JSON.parse(response).message
             $("#showLogContentComponent").find('.modal-body').html("<pre style='background-color: #EBECE4; '>"+filecontent+"</pre>");
             $('#showLogContentComponent').modal("show"); 
+            
             Swal.close();
         },function(response){
             showSwal('{{__("Log göstermede hata oluştu")}}','error');

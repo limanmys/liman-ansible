@@ -1,26 +1,92 @@
-<button  class="btn btn-primary mb-2" onclick="showModal()" type="button">
-    <i class="far fa-play-circle mr-2"></i> {{ __('Çalıştır') }}
-</button>
-
-<br>
-
-<select id="dropdown1" style="width:232px;">
-</select>
-
-<div class="mb-1"></div>
-    
-<input type="password" name="sudoPassword" id="sudopass_field" class="container-sm"
-placeholder="Sudo şifresini giriniz">
-<br><br>
-
-<div class="col" id="fileTextDiv2">
-    <textarea style="width:100%;height: 80%; min-height: 400px;" id="textDiv2"></textarea>
-    <button  class="btn btn-primary mb-2 float-right" id="fileEditButton" onclick="saveLogPlaybook()">
-        <i class="fas fa-edit" ></i> {{ __('Dosya Güncelle') }}
-    </button>
-</div>
+<div class="container-fluid mt-5">
+    <div class="row">
+      <div class="col-sm-2"style="width:100%">
+        <button  class="btn btn-primary mb-2" onclick="runPlaybook2()" type="button" style="width:232px;">
+            <i class="far fa-play-circle mr-2"></i> {{ __('Çalıştır') }}
+        </button> <br>
+        
+        <select id="dropdown1" style="width:232px;"></select>
+            <div class="mb-1"></div>
+        <input type="password" name="sudoPassword" id="sudopass_field" class="container-sm"
+            placeholder="Sudo şifresini giriniz">
+            <br><br>
+            <p id="test"></p>
+      </div>
+      <div class="col-sm-5">
+          <div class="col" id="fileTextDiv2">
+            <textarea style="width:100%;height: 80%; min-height: 400px;" id="textDiv2"></textarea>
+            <button  class="btn btn-primary mb-2 float-right" id="fileEditButton" onclick="saveLogPlaybook2()">
+                <i class="fas fa-edit" ></i> {{ __('Kaydet') }}
+            </button>
+        </div>
+      </div>
+      <div class="col-sm-5">
+        <div id="logTable1"></div>
+            @component('modal-component',[
+            "id" => "showLogContentComponent2",
+            "title" => "Dosya İçeriği"
+            ])
+            @endcomponent
+      </div>
+    </div>
+  </div>
 
 <script>
+    //$("#test").html($administrator);
+    getLog2();
+    function getLog2(){
+        let form = new FormData();
+        showSwal('{{__("Yükleniyor...")}}','info');
+        request(API('get_log2'), form, function(response) {
+            $('#logTable1').html(response).find('table').DataTable(dataTablePresets('normal'));
+            Swal.close();
+        }, function(error) {
+            error = JSON.parse(error)["message"]
+            showSwal(error,'error');
+        });
+    }
+    function showLogContent2(line){
+        let fileName = line.querySelector("#name").innerHTML;
+        //$("#test").html($fileName);
+        //console.log(line.querySelector("#name").innerHTML);
+        let formData = new FormData()
+        formData.append("fileName",fileName);
+        request(API("get_content_log2"), formData, function(response){
+            let filecontent = JSON.parse(response).message
+            $("#showLogContentComponent2").find('.modal-body').html("<pre style='background-color: #EBECE4; '>"+filecontent+"</pre>");
+            $('#showLogContentComponent2').modal("show"); 
+            Swal.close();
+        },function(response){
+            showSwal('{{__("Log göstermede hata oluştu")}}','error');
+        });
+    }
+
+    function deleteLog2(line){
+        Swal.fire({
+            title: "{{ __('Onay') }}",
+            text: "{{ __('Silmek istediğinize emin misiniz?') }}",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085D6',
+            cancelButtonColor: '#d33',
+            cancelButtonText: "{{ __('İptal') }}",
+            confirmButtonText: "{{ __('Sil') }}"
+        }).then((result) => {
+            if (result.value) {
+                showSwal('{{__("Siliniyor..")}}','info');
+                let fileName = line.querySelector('#name').innerHTML;
+                let formData = new FormData();
+                formData.append("fileName",fileName);
+                request(API("delete_log2") ,formData,function(response){
+                    showSwal('{{__("Silindi")}}', 'success',2000);
+                }, function(response){
+                    let error = JSON.parse(response);
+                    showSwal(error.message, 'error');
+                });
+            }
+        });
+    }
+
     function getPlaybooks2(){
         let form = new FormData();
         showSwal('{{__("Yükleniyor...")}}','info');
@@ -46,7 +112,7 @@ placeholder="Sudo şifresini giriniz">
         return (str.length === 0 || !str.trim());
     };
 
-    function showModal() {
+    function runPlaybook2() {
         showSwal('{{__("Yükleniyor...")}}','info');
         let data = new FormData();
 
@@ -57,7 +123,7 @@ placeholder="Sudo şifresini giriniz">
         sudopass = $('#sudopass_field').val();
         data.append('sudopass',sudopass);
         
-        request(API("list_hosts"), data, function(response) {
+        request(API("run_playbook2"), data, function(response) {
             $("#textDiv2").html(response);   
             Swal.close();  
         }, function(response) {
@@ -67,7 +133,7 @@ placeholder="Sudo şifresini giriniz">
         });
     }
 
-    function saveLogPlaybook(){
+    function saveLogPlaybook2(){
         Swal.fire({
         title: "Log Kaydet",
         inputAttributes: {
