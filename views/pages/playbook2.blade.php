@@ -143,11 +143,10 @@
         }).then((result) => {
             if (result.value) {
                 let formData = new FormData();
-                //let logContent = $("#playbookTaskModal").find('#outputArea').text();
                 formData.append("logFileName", result.value);
-                //formData.append("logFileContent", logContent);
                 request(API("playbook2_save_output") ,formData,function(response){
                     $('#playbookTaskModal').modal('hide');
+                    getLog2();
                     showSwal('{{__("Kaydedildi")}}', 'success',2000);
                 }, function(response){
                     let error = JSON.parse(response);

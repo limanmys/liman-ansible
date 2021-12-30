@@ -41,6 +41,7 @@ class LogController
 			'value' => $data,
 			'title' => ['Dosya Adı', 'Boyut', 'Kullanıcı', 'Tarih'],
 			'display' => ['name', 'size', 'user', 'date'],
+			"onclick" => "showLogContent",
 			'menu' => [
 				'Gör' => [
 					'target' => 'showLogContent',

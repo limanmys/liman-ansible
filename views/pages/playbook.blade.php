@@ -19,7 +19,6 @@
 @endcomponent
 
 <div id="playbookTable"></div>
-
 @component('modal-component',[
     "id" => "editPlaybookComponent",
     "title" => "Dosya İçeriği",

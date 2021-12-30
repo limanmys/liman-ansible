@@ -68,7 +68,7 @@ class Playbook2Controller
 			return respond('Kaydedildi', 200);
 		}
 		else
-			return respond('Kayıt başarısız!.. Boş veri)', 201);
+			return respond('Kayıt başarısız!.. (Boş veri)', 201);
 	}
 
 	public function getLog2()
@@ -105,6 +105,7 @@ class Playbook2Controller
 			'value' => $data,
 			'title' => ['Dosya Adı', 'Boyut', 'Kullanıcı', 'Tarih'],
 			'display' => ['name', 'size', 'user', 'date'],
+			"onclick" => "showLogContent2",
 			'menu' => [
 				'Gör' => [
 					'target' => 'showLogContent2',
