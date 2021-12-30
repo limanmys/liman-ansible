@@ -177,7 +177,7 @@ class PlaybookController
 	public function saveLog()
 	{
 		$logFileContent = request('logFileContent');
-		$logFileName = request('logFileName');
+		$logFileName = request('logFileName') . "-.-" . user()->name;
 
 		$checkFile = Command::runSudo(
 			'[ -f /var/playbook-logs/{:logFileName} ] && echo 1 || echo 0',

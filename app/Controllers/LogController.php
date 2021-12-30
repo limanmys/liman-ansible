@@ -14,18 +14,20 @@ class LogController
 		$data = [];
 		if ($checkDirectory == '1') {
 			$filenames = Command::run(
-				"ls -lh /var/playbook-logs| grep '^-' | awk '{print $5,$6,$7,$8,$9,$4}'"
+				"ls -lh /var/playbook-logs| grep '^-' | awk '{print $5,$6,$7,$8,$9}'"
 			);
 			$filenamesArray = explode("\n", trim($filenames));
+
 			foreach ($filenamesArray as $value) {
 				if (empty(trim($value))) {
 					continue;
 				}
 				$itemArray = explode(' ', trim($value));
+				$nameArray = explode("-.-", trim($itemArray[4]));
 				$item = [
-					'name' => $itemArray[4],
+					'name' => $nameArray[0],
 					'size' => $itemArray[0],
-					'user' => $itemArray[5],
+					'user' => $nameArray[1],
 					'date' => join('-', [
 						$itemArray[1],
 						$itemArray[2],

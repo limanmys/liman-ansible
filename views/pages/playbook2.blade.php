@@ -1,14 +1,15 @@
 <div class="container-fluid mt-5">
     <div class="row">
-      <div class="col-sm-2"style="width:100%">
-        <button  class="btn btn-primary mb-2" onclick="runPlaybook2()" type="button" style="width:232px;">
+      <div class="col-sm-2">
+        <button class="btn btn-primary mb-2" onclick="runPlaybook2()" type="button" 
+        style="width:100%;">
             <i class="far fa-play-circle mr-2"></i> {{ __('Çalıştır') }}
         </button> <br>
         
-        <select id="dropdown1" style="width:232px;"></select>
+        <select id="dropdown1" style="width:100%;"></select>
             <div class="mb-1"></div>
         <input type="password" name="sudoPassword" id="sudopass_field" class="container-sm"
-            placeholder="Sudo şifresini giriniz">
+            placeholder="Sudo şifresini giriniz" style="width:100%;">
             <br><br>
             <p id="test"></p>
       </div>
@@ -32,7 +33,6 @@
   </div>
 
 <script>
-    //$("#test").html($administrator);
     getLog2();
     function getLog2(){
         let form = new FormData();
@@ -46,9 +46,7 @@
         });
     }
     function showLogContent2(line){
-        let fileName = line.querySelector("#name").innerHTML;
-        //$("#test").html($fileName);
-        //console.log(line.querySelector("#name").innerHTML);
+        let fileName = line.querySelector("#name").innerHTML + "-.-" + line.querySelector("#user").innerHTML;
         let formData = new FormData()
         formData.append("fileName",fileName);
         request(API("get_content_log2"), formData, function(response){
@@ -74,7 +72,7 @@
         }).then((result) => {
             if (result.value) {
                 showSwal('{{__("Siliniyor..")}}','info');
-                let fileName = line.querySelector('#name').innerHTML;
+                let fileName = line.querySelector("#name").innerHTML + "-.-" + line.querySelector("#user").innerHTML;
                 let formData = new FormData();
                 formData.append("fileName",fileName);
                 request(API("delete_log2") ,formData,function(response){

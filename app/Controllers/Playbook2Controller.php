@@ -41,8 +41,7 @@ class Playbook2Controller
 	{
 		$output = Command::run('cat /var/playbooks2/test.txt');
 		$logFileContent = $output;
-		$logFileName = request('logFileName');
-		//dd(user()->name);
+		$logFileName = request('logFileName') . "-.-" . user()->name;
 		$checkFile = Command::runSudo(
 			'[ -f /var/playbook-logs/{:logFileName} ] && echo 1 || echo 0',
 			[
@@ -80,7 +79,7 @@ class Playbook2Controller
 		$data = [];
 		if ($checkDirectory == '1') {
 			$filenames = Command::run(
-				"ls -lh /var/playbook-logs| grep '^-' | awk '{print $5,$6,$7,$8,$9,$4}'"
+				"ls -lh /var/playbook-logs| grep '^-' | awk '{print $5,$6,$7,$8,$9}'"
 			);
 			$filenamesArray = explode("\n", trim($filenames));
 			foreach ($filenamesArray as $value) {
@@ -88,10 +87,11 @@ class Playbook2Controller
 					continue;
 				}
 				$itemArray = explode(' ', trim($value));
+				$nameArray = explode("-.-", trim($itemArray[4]));
 				$item = [
-					'name' => $itemArray[4],
+					'name' => $nameArray[0],
 					'size' => $itemArray[0],
-					'user' => $itemArray[5],
+					'user' => $nameArray[1],
 					'date' => join('-', [
 						$itemArray[1],
 						$itemArray[2],
@@ -100,7 +100,6 @@ class Playbook2Controller
 				];
 				array_push($data, $item);
 			}
-			//dd(user());
 		}
 		return view('table', [
 			'value' => $data,

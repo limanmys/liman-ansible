@@ -19,9 +19,8 @@
     }
 
     function showLogContent(line){
-        let fileName = line.querySelector("#name").innerHTML;
+        let fileName = line.querySelector("#name").innerHTML + "-.-" + line.querySelector("#user").innerHTML;
         let formData = new FormData();
-        //console.log(line.querySelector("#name").innerHTML);
         formData.append("fileName",fileName);
         request(API("get_content_log"), formData, function(response){
             let filecontent = JSON.parse(response).message
@@ -47,7 +46,7 @@
         }).then((result) => {
             if (result.value) {
                 showSwal('{{__("Siliniyor..")}}','info');
-                let fileName = line.querySelector('#name').innerHTML;
+                let fileName = line.querySelector("#name").innerHTML + "-.-" + line.querySelector("#user").innerHTML;
                 let formData = new FormData();
                 formData.append("fileName",fileName);
                 request(API("delete_log") ,formData,function(response){
