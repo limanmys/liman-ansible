@@ -1,6 +1,6 @@
 <div class="row">
     <div>
-        <button style="width:100%;" class="btn btn-primary mb-2" onclick="runPlaybook2()" type="button">
+        <button style="width:100%;height:38px;" class="btn btn-primary mb-2" onclick="runPlaybook2()" type="button">
             <i class="far fa-play-circle mr-2"></i> {{ __('Çalıştır') }}
         </button> 
     </div>
@@ -8,7 +8,7 @@
         <select style="width:100%;" id="dropdown1" class="select2 select2-container select2-container--bootstrap4 select2-container--below select2-container--focus"></select>
     </div>
     <div class="col-sm-2">
-        <input style="width:100%;" type="password" name="sudoPassword" id="sudopass_field" class="form-control"
+        <input style="width:100%;height:38px;" type="password" name="sudoPassword" id="sudopass_field" class="form-control"
         placeholder="Sudo şifresini giriniz">
     </div>
   </div>

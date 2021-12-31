@@ -7,30 +7,31 @@ class Playbook2Controller
 {
 	public function get2(){
 		$checkDirectory = Command::runSudo(
-			'[ -d /var/playbooks2 ] && echo 1 || echo 0'
+			'[ -d /var/playbooks ] && echo 1 || echo 0'
 		);
 		if ($checkDirectory == '0') {
-			Command::runSudo('mkdir /var/playbooks2');
+			Command::runSudo('mkdir /var/playbooks');
 		}
 		$fileList = Command::runSudo(
-			"ls -lR /var/playbooks2 | grep '.yml$' | awk '{{print $9}}'"
+			"ls -lR /var/playbooks | grep '.yml$' | awk '{{print $9}}'"
 		);
 		return $fileList;
 	}
 
 	public function runPlaybook2()
     {
+		
 		$playbookname_field = request('playbookname');
 		$sudopass_field = request('sudopass');
 		
-		Command::run("rm /var/playbooks2/test.txt");
-		Command::run("touch /var/playbooks2/test.txt");
-		Command::run("ansible-playbook /var/playbooks2/@{:playbookname_field} --extra-vars 'ansible_sudo_pass=@{:sudopass_field}'", [
+		Command::run("rm /var/playbooks/test.txt");
+		Command::run("touch /var/playbooks/test.txt");
+		Command::run("ansible-playbook /var/playbooks/@{:playbookname_field} --extra-vars 'ansible_sudo_pass=@{:sudopass_field}'", [
 			'playbookname_field' => $playbookname_field,
 			'sudopass_field' => $sudopass_field
 		]);
 
-		$output = Command::run('cat /var/playbooks2/test.txt');
+		$output = Command::run('cat /var/playbooks/test.txt');
 		if($output!="")
 			return $output;
 		else
@@ -39,7 +40,7 @@ class Playbook2Controller
 	
 	public function saveLog2()
 	{
-		$output = Command::run('cat /var/playbooks2/test.txt');
+		$output = Command::run('cat /var/playbooks/test.txt');
 		$logFileContent = $output;
 		$logFileName = request('logFileName') . "-.-" . user()->name;
 		$checkFile = Command::runSudo(

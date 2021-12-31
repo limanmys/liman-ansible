@@ -65,13 +65,6 @@ class PlaybookController
 		$fileName = request('fileName');
 		$fileContent = request('fileContent');
 
-		if (!ctype_alnum($fileName)) {
-			return respond(
-				'Dosya ismi geçersizdir (Türkçe karakter, özel karakter veya boşluk içermemelidir).',
-				201
-			);
-		}
-
 		$checkFile = Command::runSudo(
 			'[ -f /var/playbooks/{:fileName} ] && echo 1 || echo 0',
 			[
