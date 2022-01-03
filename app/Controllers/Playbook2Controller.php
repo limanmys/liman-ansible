@@ -20,17 +20,6 @@ class Playbook2Controller
 
 	public function runPlaybook2()
     {
-		
-		$playbookname_field = request('playbookname');
-		$sudopass_field = request('sudopass');
-		
-		Command::run("rm /var/playbooks/test.txt");
-		Command::run("touch /var/playbooks/test.txt");
-		Command::run("ansible-playbook /var/playbooks/@{:playbookname_field} --extra-vars 'ansible_sudo_pass=@{:sudopass_field}'", [
-			'playbookname_field' => $playbookname_field,
-			'sudopass_field' => $sudopass_field
-		]);
-
 		$output = Command::run('cat /var/playbooks/test.txt');
 		if($output!="")
 			return $output;

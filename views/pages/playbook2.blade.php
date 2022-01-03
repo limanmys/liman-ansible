@@ -8,9 +8,6 @@
         <select style="width:100%;" id="dropdown1" class="select2 select2-container select2-container--bootstrap4 select2-container--below select2-container--focus"></select>
     </div>
     <div class="col-sm-2">
-        <select style="width:100%;" id="dropdown2" class="select2 select2-container select2-container--bootstrap4 select2-container--below select2-container--focus"></select>
-    </div>
-    <div class="col-sm-2">
         <input style="width:100%;height:38px;" type="password" name="sudoPassword" id="sudopass_field" class="form-control"
         placeholder="Sudo şifresini giriniz">
     </div>
@@ -36,6 +33,23 @@
       </div>
     </div>
   </div>
+
+  @component('modal-component',[
+    "id" => "runPlaybookComponent2",
+    "title" => "Playbook Çalıştır",
+    "footer" => [
+        "text" => "Çalıştır",
+        "class" => "btn-success",
+        "onclick" => "runPlaybook22()"
+    ]
+])
+    @include('inputs', [
+        "inputs" => [
+            "Grup:group" => \App\Controllers\PlaybookController::getHostsSelect(),
+            "filename:filename" => "filename:hidden",
+        ]
+    ])
+@endcomponent
 
 <script>
     function getPlaybooks2(){
@@ -70,10 +84,10 @@
             error = JSON.parse(error)["message"]
             showSwal(error,'error');
         });
+        
     }
     
     function showLogContent2(line){
-        
         let fileName = line.querySelector("#name").innerHTML + "-.-" + line.querySelector("#user").innerHTML;
         let formData = new FormData()
         formData.append("fileName",fileName);
@@ -85,7 +99,6 @@
         },function(response){
             showSwal('{{__("Log göstermede hata oluştu")}}','error');
         });
-        
     }
 
     function deleteLog2(line){
@@ -120,23 +133,23 @@
     };
 
     function runPlaybook2() {
-        showSwal('{{__("Yükleniyor...")}}','info');
-        let data = new FormData();
         var e = document.getElementById("dropdown1");
         var playbookname=e.options[e.selectedIndex].text;
-        data.append('playbookname',playbookname);
-        sudopass = $('#sudopass_field').val();
-        data.append('sudopass',sudopass);
-        
-        request(API("run_playbook2"), data, function(response) {
-            $("#textDiv2").html(response);   
-            Swal.close();  
-        }, function(response) {
-            $("#textDiv2").html("");
-            let error = JSON.parse(response);
-            showSwal(error.message, 'error', 3000);
-        });
-        ////////////////
+        test(playbookname);
+
+        $('#playbookTaskModal').on('hidden.bs.modal',  () => {
+
+            showSwal('{{__("Yükleniyor...")}}','info');
+            let data = new FormData();
+            request(API("run_playbook2"), data, function(response) {
+                $("#textDiv2").html(response);   
+                Swal.close();  
+            }, function(response) {
+                $("#textDiv2").html("");
+                let error = JSON.parse(response);
+                showSwal(error.message, 'error', 3000);
+            }); 
+        })
         
     }
 

@@ -60,7 +60,6 @@
 @endcomponent
 
 <script>
-
     function saveLogPlaybook(){
         Swal.fire({
             title: "Log Kaydet",
@@ -104,11 +103,33 @@
         });
     }
 
+    function runPlaybook22(){
+        showSwal('{{__("Yükleniyor...")}}', 'info');
+        let fileName = $("#runPlaybookComponent2").find('input[name="filename"]').val(); 
+        let group = $("#runPlaybookComponent2").find('select[name="group"]').val(); 
+        let formData = new FormData();
+        formData.append("filename", fileName);
+        formData.append("group", group);
+        request(API("run_playbook"), formData, function(response) {
+            $('#runPlaybookComponent2').modal('hide');
+            $('#playbookTaskModal').find('.modal-body').html(JSON.parse(response).message);
+            $('#playbookTaskModal').modal("show"); 
+            Swal.close();
+        }, function(response) {
+            let error = JSON.parse(response).message
+            showSwal(error, 'error');
+        });
+    }
+
     function openRunPlaybookComponent(line){ 
         let fileName = line.querySelector("#name").innerHTML;
         $("#runPlaybookComponent").find('input[name="filename"]').val(fileName); 
         $('#runPlaybookComponent').modal('show');
-        //console.log("çalıştı");
+    }
+
+    function test(fileName){ 
+        $("#runPlaybookComponent2").find('input[name="filename"]').val(fileName); 
+        $('#runPlaybookComponent2').modal('show');
     }
 
     function openPlaybookComponent(){
