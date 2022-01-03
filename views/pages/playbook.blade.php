@@ -108,6 +108,7 @@
         let fileName = line.querySelector("#name").innerHTML;
         $("#runPlaybookComponent").find('input[name="filename"]').val(fileName); 
         $('#runPlaybookComponent').modal('show');
+        //console.log("çalıştı");
     }
 
     function openPlaybookComponent(){

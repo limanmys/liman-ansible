@@ -127,6 +127,8 @@ class PlaybookController
 
 	public function run()
 	{
+		Command::run("rm /var/playbooks/test.txt");
+		Command::run("touch /var/playbooks/test.txt");
 		Command::runSudo(
 			"sed -i 's/hosts: .*/hosts: {:group}/g' /var/playbooks/{:filename}",
 			[

@@ -51,4 +51,5 @@ return [
     "playbook2_save_output" => "Playbook2Controller@saveLog2",
     "get_playbooks2" => "Playbook2Controller@get2"
 
+
 ];

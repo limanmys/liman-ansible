@@ -8,6 +8,9 @@
         <select style="width:100%;" id="dropdown1" class="select2 select2-container select2-container--bootstrap4 select2-container--below select2-container--focus"></select>
     </div>
     <div class="col-sm-2">
+        <select style="width:100%;" id="dropdown2" class="select2 select2-container select2-container--bootstrap4 select2-container--below select2-container--focus"></select>
+    </div>
+    <div class="col-sm-2">
         <input style="width:100%;height:38px;" type="password" name="sudoPassword" id="sudopass_field" class="form-control"
         placeholder="Sudo şifresini giriniz">
     </div>
@@ -36,6 +39,7 @@
 
 <script>
     function getPlaybooks2(){
+        /////////////dropdown1/////////////
         $('#textDiv2').html('');
         $('#sudopass_field').val('');
         let form = new FormData();
@@ -56,8 +60,8 @@
             error = JSON.parse(error)["message"]
             showSwal(error,'error');
         });
-            //////////table///////////
-            let data = new FormData();
+        /////////////table/////////////
+        let data = new FormData();
         showSwal('{{__("Yükleniyor...")}}','info');
         request(API('get_log2'), data, function(response) {
             $('#logTable1').html(response).find('table').DataTable(dataTablePresets('normal'));
@@ -69,6 +73,7 @@
     }
     
     function showLogContent2(line){
+        
         let fileName = line.querySelector("#name").innerHTML + "-.-" + line.querySelector("#user").innerHTML;
         let formData = new FormData()
         formData.append("fileName",fileName);
@@ -80,6 +85,7 @@
         },function(response){
             showSwal('{{__("Log göstermede hata oluştu")}}','error');
         });
+        
     }
 
     function deleteLog2(line){
@@ -116,11 +122,9 @@
     function runPlaybook2() {
         showSwal('{{__("Yükleniyor...")}}','info');
         let data = new FormData();
-
         var e = document.getElementById("dropdown1");
         var playbookname=e.options[e.selectedIndex].text;
         data.append('playbookname',playbookname);
-
         sudopass = $('#sudopass_field').val();
         data.append('sudopass',sudopass);
         
@@ -132,6 +136,8 @@
             let error = JSON.parse(response);
             showSwal(error.message, 'error', 3000);
         });
+        ////////////////
+        
     }
 
     function saveLogPlaybook2(){
