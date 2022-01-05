@@ -20,15 +20,26 @@ class Playbook2Controller
 
 	public function runPlaybook2()
     {
+		/*$playbookname_field = request('playbookname');
+		$sudopass_field = request('sudopass');
+		
+		Command::run("rm /var/playbooks2/test.txt");
+		Command::run("touch /var/playbooks2/test.txt");
+		Command::run("ansible-playbook /var/playbooks2/@{:playbookname_field} --extra-vars 'ansible_sudo_pass=@{:sudopass_field}'", [
+			'playbookname_field' => $playbookname_field,
+			'sudopass_field' => $sudopass_field
+		]);*/
+
 		$output = Command::run('cat /var/playbooks/test.txt');
 		if($output!="")
 			return $output;
 		else
-			return respond('Hatalı sudo şifresi veya hatalı playbook)', 201);
+			return respond('İşlem tamamlanamadı..!', 201);
     }
 	
 	public function saveLog2()
 	{
+		$textArea = request('textArea');
 		$output = Command::run('cat /var/playbooks/test.txt');
 		$logFileContent = $output;
 		$logFileName = request('logFileName') . "-.-" . user()->name;
@@ -47,7 +58,7 @@ class Playbook2Controller
 		if ($checkDirectory == '0') {
 			Command::runSudo('mkdir /var/playbook-logs');
 		}
-		if($output != ""){
+		if($textArea != ""){
 			Command::runSudo(
 				"bash -c \"echo @{:logFileContent} | base64 -d | tee /var/playbook-logs/{:logFileName}\"",
 				[

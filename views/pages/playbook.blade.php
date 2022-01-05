@@ -55,6 +55,7 @@
         "inputs" => [
             "Grup:group" => \App\Controllers\PlaybookController::getHostsSelect(),
             "filename:filename" => "filename:hidden",
+            "Sudo Şifresi" => "passText:text:Sudo Şifresi giriniz",
         ]
     ])
 @endcomponent
@@ -89,8 +90,10 @@
         showSwal('{{__("Yükleniyor...")}}', 'info');
         let fileName = $("#runPlaybookComponent").find('input[name="filename"]').val(); 
         let group = $("#runPlaybookComponent").find('select[name="group"]').val(); 
+        let passText = $("#runPlaybookComponent").find('input[name="passText"]').val(); 
         let formData = new FormData();
         formData.append("filename", fileName);
+        formData.append("passText", passText);
         formData.append("group", group);
         request(API("run_playbook"), formData, function(response) {
             $('#runPlaybookComponent').modal('hide');
@@ -103,13 +106,15 @@
         });
     }
 
-    function runPlaybook22(){
+    function runPlaybook2(){
         showSwal('{{__("Yükleniyor...")}}', 'info');
         let fileName = $("#runPlaybookComponent2").find('input[name="filename"]').val(); 
         let group = $("#runPlaybookComponent2").find('select[name="group"]').val(); 
+        let passText = $("#runPlaybookComponent2").find('input[name="passText"]').val(); 
         let formData = new FormData();
         formData.append("filename", fileName);
         formData.append("group", group);
+        formData.append("passText", passText);
         request(API("run_playbook"), formData, function(response) {
             $('#runPlaybookComponent2').modal('hide');
             $('#playbookTaskModal').find('.modal-body').html(JSON.parse(response).message);
@@ -127,7 +132,7 @@
         $('#runPlaybookComponent').modal('show');
     }
 
-    function test(fileName){ 
+    function openRunPlaybookComponent2(fileName){ 
         $("#runPlaybookComponent2").find('input[name="filename"]').val(fileName); 
         $('#runPlaybookComponent2').modal('show');
     }

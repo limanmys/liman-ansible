@@ -58,7 +58,7 @@ class LogController
 	public function getContent()
 	{
 		$fileName = request('fileName');
-		$output = Command::runSudo('cat  /var/playbook-logs/{:fileName}', [
+		$output = Command::runSudo('cat /var/playbook-logs/{:fileName}', [
 			'fileName' => $fileName
 		]);
 		return respond($output, 200);

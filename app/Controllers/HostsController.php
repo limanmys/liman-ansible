@@ -49,11 +49,13 @@ class HostsController
 			'hostsFilePath' => $this->hostsFilePath
 		]);
 		preg_match_all('/\[(.*)\]/', $output, $matches);
+		
 		$hostNameArray = collect($matches[1])
 			->map(function ($i) {
 				return ['name' => $i];
 			}, $matches[1])
 			->toArray();
+		
 		return view('table', [
 			'value' => $hostNameArray,
 			'title' => ['Host Adı'],
@@ -219,14 +221,13 @@ class HostsController
 				'hostsFilePath' => $this->hostsFilePath
 			]
 		);
-		$arrayHosts = yaml_parse($textHostFile)['all']['children'];
+		/*$arrayHosts = yaml_parse($textHostFile)['all']['children'];
 
 		if (array_key_exists($groupname, $arrayHosts)) {
 			return respond('Böyle bir grup bulunmaktadır.', 201);
-		}
-
+		}*/
 		$output = Command::runSudo(
-			"sh -c 'echo \"\n[{:groupname}]\n\"  >> {:hostsFilePath}'",
+			"sh -c 'echo [{:groupname}]  >> {:hostsFilePath}'",
 			[
 				'groupname' => $groupname,
 				'hostsFilePath' => $this->hostsFilePath

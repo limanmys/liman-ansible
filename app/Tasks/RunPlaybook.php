@@ -5,11 +5,19 @@ namespace App\Tasks;
 use Liman\Toolkit\Formatter;
 use Liman\Toolkit\RemoteTask\Task;
 use Liman\Toolkit\Shell\Command;
-
+/*$playbookname_field = request('playbookname');
+		$sudopass_field = request('sudopass');
+		
+		Command::run("rm /var/playbooks2/test.txt");
+		Command::run("touch /var/playbooks2/test.txt");
+		Command::run(" /var/playbooks/@{:playbookname_field} --extra-vars 'ansible_sudo_pass=@{:sudopass_field}'", [
+			'playbookname_field' => $playbookname_field,
+			'sudopass_field' => $sudopass_field
+]);*/
 class RunPlaybook extends Task
 {
 	protected $description = 'Playbook çalıştırılıyor...';
-	protected $command = 'ansible-playbook /var/playbooks/{:filename} -i /etc/ansible/hosts';
+	protected $command = "ansible-playbook /var/playbooks/{:filename} -i /etc/ansible/hosts --extra-vars 'ansible_sudo_pass={:passText}'";
 	protected $sudoRequired = false;
 	protected $control = 'ansible-playbook';
 
@@ -21,7 +29,8 @@ class RunPlaybook extends Task
 
 		$this->attributes = $attributes;
 		$this->logFile = Formatter::run('/tmp/ansible-playbook-{:filename}', [
-			'filename' => $attributes['filename']
+			'filename' => $attributes['filename'],
+			'passText' => $attributes['passText']
 		]);
 	}
 

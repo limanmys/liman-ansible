@@ -1,18 +1,14 @@
 <div class="row">
     <div>
-        <button style="width:100%;height:38px;" class="btn btn-primary mb-2" onclick="runPlaybook2()" type="button">
+        <button style="width:100%;height:38px;" class="btn btn-primary mb-2" onclick="runPlaybookwithHostSelection()" type="button">
             <i class="far fa-play-circle mr-2"></i> {{ __('Çalıştır') }}
         </button> 
     </div>
     <div class="col-sm-2">
         <select style="width:100%;" id="dropdown1" class="select2 select2-container select2-container--bootstrap4 select2-container--below select2-container--focus"></select>
     </div>
-    <div class="col-sm-2">
-        <input style="width:100%;height:38px;" type="password" name="sudoPassword" id="sudopass_field" class="form-control"
-        placeholder="Sudo şifresini giriniz">
-    </div>
   </div>
-
+  
 <div class="container-fluid mt-3">
     <div class="row">
       <div class="col-sm-6">
@@ -40,13 +36,14 @@
     "footer" => [
         "text" => "Çalıştır",
         "class" => "btn-success",
-        "onclick" => "runPlaybook22()"
+        "onclick" => "runPlaybook2()"
     ]
 ])
     @include('inputs', [
         "inputs" => [
             "Grup:group" => \App\Controllers\PlaybookController::getHostsSelect(),
             "filename:filename" => "filename:hidden",
+            "Sudo Şifresi" => "passText:text:Sudo Şifresi giriniz",
         ]
     ])
 @endcomponent
@@ -55,7 +52,6 @@
     function getPlaybooks2(){
         /////////////dropdown1/////////////
         $('#textDiv2').html('');
-        $('#sudopass_field').val('');
         let form = new FormData();
         showSwal('{{__("Yükleniyor...")}}','info');
         request(API('get_playbooks2'), form, function(response) {
@@ -84,9 +80,8 @@
             error = JSON.parse(error)["message"]
             showSwal(error,'error');
         });
-        
     }
-    
+
     function showLogContent2(line){
         let fileName = line.querySelector("#name").innerHTML + "-.-" + line.querySelector("#user").innerHTML;
         let formData = new FormData()
@@ -132,13 +127,12 @@
         return (str.length === 0 || !str.trim());
     };
 
-    function runPlaybook2() {
+    function runPlaybookwithHostSelection() {
         var e = document.getElementById("dropdown1");
         var playbookname=e.options[e.selectedIndex].text;
-        test(playbookname);
+        openRunPlaybookComponent2(playbookname);
 
         $('#playbookTaskModal').on('hidden.bs.modal',  () => {
-
             showSwal('{{__("Yükleniyor...")}}','info');
             let data = new FormData();
             request(API("run_playbook2"), data, function(response) {
@@ -150,7 +144,6 @@
                 showSwal(error.message, 'error', 3000);
             }); 
         })
-        
     }
 
     function saveLogPlaybook2(){
@@ -163,17 +156,18 @@
         showCancelButton: true,
         confirmButtonText: 'Kaydet',
         }).then((result) => {
-            if (result.value) {
+            if (result.value) {                    
                 let formData = new FormData();
+                formData.append("textArea",$("#textDiv2").val());
                 formData.append("logFileName", result.value);
                 request(API("playbook2_save_output") ,formData,function(response){
-                    getPlaybooks2();
                     $('#playbookTaskModal').modal('hide');
                     showSwal('{{__("Kaydedildi")}}', 'success',2000);
+                    getPlaybooks2();
                 }, function(response){
                     let error = JSON.parse(response);
                     showSwal(error.message, 'error', 3000);
-                }); 
+                });
             }
         });        
     }

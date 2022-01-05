@@ -53,7 +53,7 @@ class PlaybookController
 	public function getContent()
 	{
 		$fileName = request('fileName');
-		$output = Command::runSudo('cat  /var/playbooks/{:fileName} | base64', [
+		$output = Command::runSudo('cat /var/playbooks/{:fileName} | base64', [
 			'fileName' => $fileName
 		]);
 
@@ -145,7 +145,8 @@ class PlaybookController
 						'name' => 'RunPlaybook',
 						'attributes' => [
 							'filename' => request('filename'),
-							'group' => request('group')
+							'group' => request('group'),
+							'passText' => request('passText')
 						]
 					]
 				]
