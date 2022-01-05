@@ -20,21 +20,11 @@ class Playbook2Controller
 
 	public function runPlaybook2()
     {
-		/*$playbookname_field = request('playbookname');
-		$sudopass_field = request('sudopass');
-		
-		Command::run("rm /var/playbooks2/test.txt");
-		Command::run("touch /var/playbooks2/test.txt");
-		Command::run("ansible-playbook /var/playbooks2/@{:playbookname_field} --extra-vars 'ansible_sudo_pass=@{:sudopass_field}'", [
-			'playbookname_field' => $playbookname_field,
-			'sudopass_field' => $sudopass_field
-		]);*/
-
 		$output = Command::run('cat /var/playbooks/test.txt');
 		if($output!="")
 			return $output;
 		else
-			return respond('İşlem tamamlanamadı..!', 201);
+			return respond('Playbook çıktısı bulunamadı..!', 201);
     }
 	
 	public function saveLog2()
