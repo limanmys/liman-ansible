@@ -118,12 +118,16 @@
         request(API("run_playbook"), formData, function(response) {
             $('#runPlaybookComponent2').modal('hide');
             $('#playbookTaskModal').find('.modal-body').html(JSON.parse(response).message);
-            $('#playbookTaskModal').modal("show"); 
+            $('#playbookTaskModal').modal("show");
             Swal.close();
         }, function(response) {
             let error = JSON.parse(response).message
             showSwal(error, 'error');
         });
+        $('#playbookTaskModal').on('hidden.bs.modal',  () => {
+            getPlaybooks2();
+        })
+        
     }
 
     function openRunPlaybookComponent(line){ 
