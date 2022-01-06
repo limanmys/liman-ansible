@@ -1,4 +1,4 @@
- <button  class="btn btn-primary mb-2" onclick="openPlaybookComponent()">
+<button  class="btn btn-primary mb-2" onclick="openPlaybookComponent()">
     <i class="fas fa-plus"></i> {{ __('Dosya Oluştur') }}
 </button>
 
@@ -18,7 +18,28 @@
     ])
 @endcomponent
 
-<div id="playbookTable"></div>
+<div class="row">
+    <div class="col-sm-6">
+        <div id="playbookTable"></div>
+    </div>
+    <div class="col-sm-6">
+        <div class="col" id="outputTextArea">
+            <textarea style="width:100%;height:100%;min-height:200px;" id="outputText"></textarea>
+            <button  class="btn btn-primary mb-2 float-right" id="fileEditButton" onclick="saveLogOutput()">
+                <i class="fas fa-edit" ></i> {{ __('Kaydet') }}
+            </button>
+        </div>
+        <div id="logTable1" style="width:100%;"></div>
+    </div>
+</div>
+
+
+@component('modal-component',[
+    "id" => "showLogContentComponent",
+    "title" => "Dosya İçeriği"
+    ])
+@endcomponent
+
 @component('modal-component',[
     "id" => "editPlaybookComponent",
     "title" => "Dosya İçeriği",
@@ -27,7 +48,7 @@
         "class" => "btn-primary",
         "onclick" => "editPlaybook()"
     ]
-])
+    ])
     @include('inputs', [
         "inputs" => [
             "Dosya içeriği" => "contentfile:textarea",
@@ -61,31 +82,6 @@
 @endcomponent
 
 <script>
-    function saveLogPlaybook(){
-        Swal.fire({
-            title: "Log Kaydet",
-            inputAttributes: {
-                placeholder: 'Dosya Adı'
-            },
-            input: 'text',
-            showCancelButton: true,
-            confirmButtonText: 'Kaydet',
-            }).then((result) => {
-                if (result.value) {
-                    let formData = new FormData();
-                    let logContent = $("#playbookTaskModal").find('#outputArea').text();
-                    formData.append("logFileName", result.value);
-                    formData.append("logFileContent", logContent);
-                    request(API("playbook_save_output") ,formData,function(response){
-                        $('#playbookTaskModal').modal('hide');
-                        showSwal('{{__("Kaydedildi")}}', 'success',2000);
-                    }, function(response){
-                        let error = JSON.parse(response);
-                        showSwal(error.message, 'error');
-                    }); 
-                }
-        });
-    }
     function runPlaybook(){
         showSwal('{{__("Yükleniyor...")}}', 'info');
         let fileName = $("#runPlaybookComponent").find('input[name="filename"]').val(); 
@@ -104,41 +100,101 @@
             let error = JSON.parse(response).message
             showSwal(error, 'error');
         });
+
+        $('#playbookTaskModal').on('hidden.bs.modal',  () => {
+            showSwal('{{__("Yükleniyor...")}}','info');
+            let data = new FormData();
+            request(API("get_Output"), data, function(response) {
+                $("#outputText").html(response);   
+                Swal.close();  
+            }, function(response) {
+                $("#outputText").html("");
+                let error = JSON.parse(response);
+                showSwal(error.message, 'error', 3000);
+            }); 
+        })
     }
 
-    function runPlaybook2(){
-        showSwal('{{__("Yükleniyor...")}}', 'info');
-        let fileName = $("#runPlaybookComponent2").find('input[name="filename"]').val(); 
-        let group = $("#runPlaybookComponent2").find('select[name="group"]').val(); 
-        let passText = $("#runPlaybookComponent2").find('input[name="passText"]').val(); 
-        let formData = new FormData();
-        formData.append("filename", fileName);
-        formData.append("group", group);
-        formData.append("passText", passText);
-        request(API("run_playbook"), formData, function(response) {
-            $('#runPlaybookComponent2').modal('hide');
-            $('#playbookTaskModal').find('.modal-body').html(JSON.parse(response).message);
-            $('#playbookTaskModal').modal("show");
+    function getPlaybooks(){
+        $('#outputText').html('');
+        let form = new FormData();
+        showSwal('{{__("Yükleniyor...")}}','info');
+        request(API('get_playbooks'), form, function(response) {
+            $('#playbookTable').html(response).find('table').DataTable(dataTablePresets('normal'));
             Swal.close();
-        }, function(response) {
-            let error = JSON.parse(response).message
-            showSwal(error, 'error');
+        }, function(error) {
+            error = JSON.parse(error)["message"]
+            showSwal(error,'error');
+        });
+        
+        let data = new FormData();
+        showSwal('{{__("Yükleniyor...")}}','info');
+        request(API('get_log'), data, function(response) {
+            $('#logTable1').html(response).find('table').DataTable(dataTablePresets('normal'));
+            Swal.close();
+        }, function(error) {
+            error = JSON.parse(error)["message"]
+            showSwal(error,'error');
+        });
+    }
+
+    function saveLogPlaybook(){
+        Swal.fire({
+            title: "Log Kaydet",
+            inputAttributes: {
+                placeholder: 'Dosya Adı'
+            },
+            input: 'text',
+            showCancelButton: true,
+            confirmButtonText: 'Kaydet',
+            }).then((result) => {
+                if (result.value) {
+                    let formData = new FormData();
+                    let logContent = $("#playbookTaskModal").find('#outputArea').text();
+                    formData.append("logFileName", result.value);
+                    formData.append("logFileContent", logContent);
+                    request(API("playbook_save_task") ,formData,function(response){
+                        $('#playbookTaskModal').modal('hide');
+                        showSwal('{{__("Kaydedildi")}}', 'success',2000);
+                    }, function(response){
+                        let error = JSON.parse(response);
+                        showSwal(error.message, 'error');
+                    }); 
+                }
         });
         $('#playbookTaskModal').on('hidden.bs.modal',  () => {
-            getPlaybooks2();
+            getPlaybooks();
         })
-        
+    }
+    function saveLogOutput(){
+        Swal.fire({
+        title: "Log Kaydet",
+        inputAttributes: {
+            placeholder: 'Dosya Adı'
+        },
+        input: 'text',
+        showCancelButton: true,
+        confirmButtonText: 'Kaydet',
+        }).then((result) => {
+            if (result.value) {                    
+                let formData = new FormData();
+                formData.append("textArea",$("#outputText").val());
+                formData.append("logFileName", result.value);
+                request(API("playbook_save_output") ,formData,function(response){
+                    showSwal('{{__("Kaydedildi")}}', 'success',2000);
+                    getPlaybooks();
+                }, function(response){
+                    let error = JSON.parse(response);
+                    showSwal(error.message, 'error', 3000);
+                });
+            }
+        });  
     }
 
     function openRunPlaybookComponent(line){ 
         let fileName = line.querySelector("#name").innerHTML;
         $("#runPlaybookComponent").find('input[name="filename"]').val(fileName); 
         $('#runPlaybookComponent').modal('show');
-    }
-
-    function openRunPlaybookComponent2(fileName){ 
-        $("#runPlaybookComponent2").find('input[name="filename"]').val(fileName); 
-        $('#runPlaybookComponent2').modal('show');
     }
 
     function openPlaybookComponent(){
@@ -161,18 +217,6 @@
         }, function(response){
             let error = JSON.parse(response);
             showSwal(error.message, 'error');
-        });
-    }
-
-    function getPlaybooks(){
-        let form = new FormData();
-        showSwal('{{__("Yükleniyor...")}}','info');
-        request(API('get_playbooks'), form, function(response) {
-            $('#playbookTable').html(response).find('table').DataTable(dataTablePresets('normal'));
-            Swal.close();
-        }, function(error) {
-            error = JSON.parse(error)["message"]
-            showSwal(error,'error');
         });
     }
 
