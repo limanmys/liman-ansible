@@ -23,7 +23,3 @@ Playbook kısmında playbook oluşturup sağ tık ile çalıştır diyerek grup 
 Detaylı bilgi için aşağıdaki yazıyı okuyabilirsiniz.
 
 https://dev.to/liman/ansible-yonetim-eklentisi-4ina
-
-### Playbook-2 Çalıştırma
-
-/var/playbooks2/ dizini altında hazırladığımız playbookları(.yml) Combobox'dan seçip sudo şifresi ile çalıştırabiliriz. Çıktı tablo biçiminde görüntülenmektedir ve isteğe göre log olarak kayıt edilebilir.
