@@ -100,7 +100,7 @@ class PlaybookController
 					'icon' => 'fa-eye'
 				],
 				'Sil' => [
-					'target' => 'deleteLog',
+					'target' => 'deletePlaybookLog',
 					'icon' => 'fa-trash'
 				]
 			]
@@ -182,7 +182,7 @@ class PlaybookController
 		}
 	}
 
-	public function deleteLog()
+	public function deletePlaybookLog()
 	{
 		$fileName = request('fileName');
 		$result = Command::runSudo('rm -rf /var/playbook-logs/{:fileName}', [

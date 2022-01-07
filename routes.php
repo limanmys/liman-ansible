@@ -28,6 +28,7 @@ return [
     "get_log" => "PlaybookController@getLog",
     "edit_playbook" => "PlaybookController@edit",
     "delete_playbook" => "PlaybookController@delete",
+    "delete_playbook_log" => "PlaybookController@deletePlaybookLog",
     "create_playbook" => "PlaybookController@create",
     "run_playbook" => "PlaybookController@run",
     "playbook_save_task" => "PlaybookController@savePlaybookTask",
