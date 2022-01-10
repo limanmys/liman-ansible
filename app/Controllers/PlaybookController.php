@@ -18,7 +18,7 @@ class PlaybookController
 		$fileList = Command::runSudo(
 			"ls -l /var/playbooks | awk '{{print $9}}'"
 		);
-		if (!empty($output)) {
+		if (empty($output)) {
 			$fileArray = explode("\n", $fileList);
 			$fileJson = collect($fileArray)->map(function ($i) {
 				return ['name' => $i];
