@@ -11,14 +11,14 @@ class TemplateController
 		$checkDirectory = Command::runSudo(
 			'[ -d /var/templates ] && echo 1 || echo 0'
 		);
-		if ($checkDirectory == '0') {
+		if ((bool) !$checkDirectory) {
 			Command::runSudo('mkdir /var/templates');
 		}
 		$fileJson = [];
 		$fileList = Command::runSudo(
 			"ls -l /var/templates | awk '{{print $9}}'"
 		);
-		if ($fileList != '') {
+		if (!empty($fileList)) {
 			$fileArray = explode("\n", $fileList);
 			$fileJson = collect($fileArray)->map(function ($i) {
 				return [
@@ -50,9 +50,8 @@ class TemplateController
 
 	public function getContent()
 	{
-		$fileName = request('fileName');
 		$output = Command::runSudo('cat  /var/templates/{:fileName} | base64', [
-			'fileName' => $fileName
+			'fileName' => request('fileName')
 		]);
 
 		return respond(base64_decode($output), 200);
@@ -77,7 +76,7 @@ class TemplateController
 			]
 		);
 
-		if ($checkFile == '1') {
+		if ((bool) $checkFile) {
 			return respond('Dosya zaten bulunmaktadır', 201);
 		}
 
@@ -89,7 +88,7 @@ class TemplateController
 			]
 		);
 
-		if (trim($result) == '') {
+		if (empty(trim($result))) {
 			return respond('Oluşturuldu', 200);
 		} else {
 			return respond($result, 201);
@@ -98,17 +97,15 @@ class TemplateController
 
 	public function edit()
 	{
-		$fileName = request('fileName');
-		$contentFile = request('contentFile');
 		$result = Command::runSudo(
 			"sh -c \"echo @{:contentFile}| base64 -d | tee /var/templates/{:fileName}\"  1>/dev/null",
 			[
-				'contentFile' => base64_encode($contentFile),
-				'fileName' => $fileName
+				'contentFile' => base64_encode(request('contentFile')),
+				'fileName' => request('fileName')
 			]
 		);
 
-		if (trim($result) == '') {
+		if (empty(trim($result))) {
 			return respond('Güncellendi', 200);
 		} else {
 			return respond($result, 201);
@@ -117,13 +114,11 @@ class TemplateController
 
 	public function delete()
 	{
-		$fileName = request('fileName');
-
 		$result = Command::runSudo('rm -rf /var/templates/{:fileName}', [
-			'fileName' => $fileName
+			'fileName' => request('fileName')
 		]);
 
-		if (trim($result) == '') {
+		if (empty(trim($result))) {
 			return respond('Silindi', 200);
 		} else {
 			return respond($result, 201);

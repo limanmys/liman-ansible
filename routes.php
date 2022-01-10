@@ -15,6 +15,7 @@ return [
     "add_ssh_key_request" => "HostsController@addSshKeyRequest",
     "remove_ssh_key" => "HostsController@removeShhKey",
     "delete_group" => "HostsController@deleteGroup",
+    "test_api" => "HostsController@test",
 
     "get_files" => "FileController@get",
     "get_file_content" => "FileController@getContent",
@@ -26,6 +27,7 @@ return [
     "get_playbooks" => "PlaybookController@get",
     "get_content_playbook" => "PlaybookController@getContent",
     "get_log" => "PlaybookController@getLog",
+    "get_content_log" => "PlaybookController@getContentLog",
     "edit_playbook" => "PlaybookController@edit",
     "delete_playbook" => "PlaybookController@delete",
     "delete_playbook_log" => "PlaybookController@deletePlaybookLog",
@@ -33,7 +35,7 @@ return [
     "run_playbook" => "PlaybookController@run",
     "playbook_save_task" => "PlaybookController@savePlaybookTask",
     "playbook_save_output" => "PlaybookController@savePlaybookOutput",
-    "get_Output" => "PlaybookController@getOutput",
+    "get_output" => "PlaybookController@getOutput",
     
     "get_templates" => "TemplateController@get",
     "create_template" => "TemplateController@create",
@@ -45,7 +47,7 @@ return [
     "checkTask" => "TaskController@checkTask",
 
     "get_logs" => "LogController@get",
-    "get_content_log" => "LogController@getContent",
-    "delete_log" => "LogController@delete"
+    "delete_log" => "LogController@delete",
+    "get_content" => "LogController@getContentLog"
 
 ];

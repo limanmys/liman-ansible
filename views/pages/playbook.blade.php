@@ -13,7 +13,7 @@
                 <i class="fas fa-edit" ></i> {{ __('Kaydet') }}
             </button>
         </div>
-        <div id="logTable1" style="width:100%;"></div>
+        <div id="playbookLogTable" style="width:100%;"></div>
     </select>
     </div>
 </div>
@@ -105,7 +105,7 @@
         $('#playbookTaskModal').on('hidden.bs.modal',  () => {
             showSwal('{{__("Yükleniyor...")}}','info');
             let data = new FormData();
-            request(API("get_Output"), data, function(response) {
+            request(API("get_output"), data, function(response) {
                 $("#outputText").val(response);   
                 Swal.close();  
             }, function(response) {
@@ -118,7 +118,6 @@
 
     function getPlaybooks(){
         $('#outputText').val('');
-        console.log('here');
         let form = new FormData();
         showSwal('{{__("Yükleniyor...")}}','info');
         request(API('get_playbooks'), form, function(response) {
@@ -132,7 +131,7 @@
         let data = new FormData();
         showSwal('{{__("Yükleniyor...")}}','info');
         request(API('get_log'), data, function(response) {
-            $('#logTable1').html(response).find('table').DataTable(dataTableCustomTablePreset());
+            $('#playbookLogTable').html(response).find('table').DataTable(dataTableCustomTablePreset());
             Swal.close();
         }, function(error) {
             error = JSON.parse(error)["message"]
@@ -150,6 +149,20 @@
                 "lengthMenu": [ 5, 10, 25, 50 ]
             }
         );        
+    }
+
+    function showLogContent(line){
+        let fileName = line.querySelector("#name").innerHTML + "-.-" + line.querySelector("#user").innerHTML;
+        let formData = new FormData();
+        formData.append("fileName",fileName);
+        request(API("get_content_log"), formData, function(response){
+            let filecontent = JSON.parse(response).message
+            $("#showLogContentComponent").find('.modal-body').html("<pre style='background-color: #EBECE4; '>"+filecontent+"</pre>");
+            $('#showLogContentComponent').modal("show");
+            Swal.close();
+        },function(response){
+            showSwal('{{__("Log göstermede hata oluştu")}}','error');
+        });
     }
 
     function saveLogPlaybook(){
@@ -280,7 +293,7 @@
             showSwal(error,'error');
         });
     }
-
+    
     function deletePlaybook(line){
         Swal.fire({
             title: "{{ __('Onay') }}",

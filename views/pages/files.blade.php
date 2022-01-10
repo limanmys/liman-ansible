@@ -38,11 +38,10 @@
             })
         }
     }); 
-
-    function getFileContent(data2){
+    function getFileContent(getData){
         showSwal('{{__("Yükleniyor...")}}','info');
-        var data = new FormData();
-        var filePath = data2.node.id;
+        let data = new FormData();
+        let filePath = getData.node.id;
         data.append("filePath",filePath);
         request("{{API('get_file_content')}}", data, function(response) {
             $("#textDiv").val(response);
@@ -101,7 +100,7 @@
             showSwal(error.message,'error');
         });
     }
-
+    
     function getFiles(){
         let types = {
             "directory" : {

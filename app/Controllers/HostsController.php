@@ -72,15 +72,13 @@ class HostsController
 
 	function getContent()
 	{
-		$hostName = request('hostName');
-		$output =
-			Command::runSudo("cat {:hostsFilePath} | grep -v '^#'", [
+		$output = Command::runSudo("cat {:hostsFilePath} | grep -v '^#'", [
 				'hostsFilePath' => $this->hostsFilePath
 			]) . ' [';
 
 		$output = str_replace("\n", '---', $output);
 		preg_match(
-			'/\[' . $hostName . '\s*](.*?)(?=\[)/',
+			'/\[' . request('hostName') . '\s*](.*?)(?=\[)/',
 			trim($output),
 			$matches
 		);
@@ -210,8 +208,8 @@ class HostsController
 			return respond($output, 201);
 		}
 	}
-
-	function addGroup()
+	
+function addGroup()
 	{
 		$groupname = trim(request('groupname'));
 
@@ -221,13 +219,14 @@ class HostsController
 				'hostsFilePath' => $this->hostsFilePath
 			]
 		);
-		/*$arrayHosts = yaml_parse($textHostFile)['all']['children'];
+		$arrayHosts = yaml_parse($textHostFile)['all']['children'];
 
 		if (array_key_exists($groupname, $arrayHosts)) {
 			return respond('Böyle bir grup bulunmaktadır.', 201);
-		}*/
+		}
+
 		$output = Command::runSudo(
-			"sh -c 'echo [{:groupname}]  >> {:hostsFilePath}'",
+			"sh -c 'echo \"\n[{:groupname}]\n\"  >> {:hostsFilePath}'",
 			[
 				'groupname' => $groupname,
 				'hostsFilePath' => $this->hostsFilePath

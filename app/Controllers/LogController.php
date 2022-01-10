@@ -41,10 +41,10 @@ class LogController
 			'value' => $data,
 			'title' => ['Dosya Adı', 'Boyut', 'Kullanıcı', 'Tarih'],
 			'display' => ['name', 'size', 'user', 'date'],
-			"onclick" => "showLogContent",
+			"onclick" => "logContent",
 			'menu' => [
 				'Gör' => [
-					'target' => 'showLogContent',
+					'target' => 'logContent',
 					'icon' => 'fa-eye'
 				],
 				'Sil' => [
@@ -55,20 +55,18 @@ class LogController
 		]);
 	}
 
-	public function getContent()
+	public function getContentLog()
 	{
-		$fileName = request('fileName');
 		$output = Command::runSudo('cat /var/playbook-logs/{:fileName}', [
-			'fileName' => $fileName
+			'fileName' => request('fileName')
 		]);
 		return respond($output, 200);
 	}
 
 	public function delete()
 	{
-		$fileName = request('fileName');
 		$result = Command::runSudo('rm -rf /var/playbook-logs/{:fileName}', [
-			'fileName' => $fileName
+			'fileName' => request('fileName')
 		]);
 
 		if (trim($result) == '') {

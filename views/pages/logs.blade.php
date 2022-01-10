@@ -1,16 +1,16 @@
-<div id="logTable2"></div>
+<div id="logTable"></div>
 
 @component('modal-component',[
-    "id" => "showLogContentComponent",
+    "id" => "LogContentComponent",
     "title" => "Dosya İçeriği"
-])
+    ])
 @endcomponent
 <script>
     function getLogs(){
         let form = new FormData();
         showSwal('{{__("Yükleniyor...")}}','info');
         request(API('get_logs'), form, function(response) {
-            $('#logTable2').html(response).find('table').DataTable(dataTablePresets('normal'));
+            $('#logTable').html(response).find('table').DataTable(dataTablePresets('normal'));
             Swal.close();
         }, function(error) {
             error = JSON.parse(error)["message"]
@@ -18,21 +18,23 @@
         });
     }
 
-    function showLogContent(line){
-        let fileName = line.querySelector("#name").innerHTML + "-.-" + line.querySelector("#user").innerHTML;
+    function logContent(line){
+        let name = $(line).find("#name").html();
+        let user = $(line).find("#user").html();
+        let fileName = name + "-.-" + user;
         let formData = new FormData();
         formData.append("fileName",fileName);
-        request(API("get_content_log"), formData, function(response){
+        request(API("get_content"), formData, function(response){
             let filecontent = JSON.parse(response).message
-            $("#showLogContentComponent").find('.modal-body').html("<pre style='background-color: #EBECE4; '>"+filecontent+"</pre>");
-            $('#showLogContentComponent').modal("show"); 
+            $("#LogContentComponent").find('.modal-body').html("<pre style='background-color: #EBECE4; '>"+filecontent+"</pre>");
+            $('#LogContentComponent').modal("show"); 
             
             Swal.close();
         },function(response){
             showSwal('{{__("Log göstermede hata oluştu")}}','error');
         });
     }
-
+    
     function deleteLog(line){
         Swal.fire({
             title: "{{ __('Onay') }}",
@@ -46,7 +48,9 @@
         }).then((result) => {
             if (result.value) {
                 showSwal('{{__("Siliniyor..")}}','info');
-                let fileName = line.querySelector("#name").innerHTML + "-.-" + line.querySelector("#user").innerHTML;
+                let name = $(line).find("#name").html();
+                let user = $(line).find("#user").html();
+                let fileName = name + "-.-" + user;
                 let formData = new FormData();
                 formData.append("fileName",fileName);
                 request(API("delete_log") ,formData,function(response){
