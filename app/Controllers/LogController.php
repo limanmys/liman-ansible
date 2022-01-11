@@ -17,14 +17,17 @@ class LogController
 				"ls -lh /var/playbook-logs| grep '^-' | awk '{print $5,$6,$7,$8,$9}'"
 			);
 			$filenamesArray = explode("\n", trim($filenames));
+
 			foreach ($filenamesArray as $value) {
 				if (empty(trim($value))) {
 					continue;
 				}
 				$itemArray = explode(' ', trim($value));
+				$nameArray = explode("-.-", trim($itemArray[4]));
 				$item = [
-					'name' => end($itemArray),
+					'name' => $nameArray[0],
 					'size' => $itemArray[0],
+					'user' => $nameArray[1],
 					'date' => join('-', [
 						$itemArray[1],
 						$itemArray[2],
@@ -36,11 +39,12 @@ class LogController
 		}
 		return view('table', [
 			'value' => $data,
-			'title' => ['Dosya Adı', 'Boyut', 'Tarih'],
-			'display' => ['name', 'size', 'date'],
+			'title' => ['Dosya Adı', 'Boyut', 'Kullanıcı', 'Tarih'],
+			'display' => ['name', 'size', 'user', 'date'],
+			"onclick" => "logContent",
 			'menu' => [
 				'Gör' => [
-					'target' => 'showLogContent',
+					'target' => 'logContent',
 					'icon' => 'fa-eye'
 				],
 				'Sil' => [
@@ -51,20 +55,18 @@ class LogController
 		]);
 	}
 
-	public function getContent()
+	public function getContentLog()
 	{
-		$fileName = request('fileName');
-		$output = Command::runSudo('cat  /var/playbook-logs/{:fileName}', [
-			'fileName' => $fileName
+		$output = Command::runSudo('cat /var/playbook-logs/{:fileName}', [
+			'fileName' => request('fileName')
 		]);
 		return respond($output, 200);
 	}
 
 	public function delete()
 	{
-		$fileName = request('fileName');
 		$result = Command::runSudo('rm -rf /var/playbook-logs/{:fileName}', [
-			'fileName' => $fileName
+			'fileName' => request('fileName')
 		]);
 
 		if (trim($result) == '') {

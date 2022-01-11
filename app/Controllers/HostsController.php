@@ -49,11 +49,13 @@ class HostsController
 			'hostsFilePath' => $this->hostsFilePath
 		]);
 		preg_match_all('/\[(.*)\]/', $output, $matches);
+		
 		$hostNameArray = collect($matches[1])
 			->map(function ($i) {
 				return ['name' => $i];
 			}, $matches[1])
 			->toArray();
+		
 		return view('table', [
 			'value' => $hostNameArray,
 			'title' => ['Host Adı'],
@@ -70,15 +72,13 @@ class HostsController
 
 	function getContent()
 	{
-		$hostName = request('hostName');
-		$output =
-			Command::runSudo("cat {:hostsFilePath} | grep -v '^#'", [
+		$output = Command::runSudo("cat {:hostsFilePath} | grep -v '^#'", [
 				'hostsFilePath' => $this->hostsFilePath
 			]) . ' [';
 
 		$output = str_replace("\n", '---', $output);
 		preg_match(
-			'/\[' . $hostName . '\s*](.*?)(?=\[)/',
+			'/\[' . request('hostName') . '\s*](.*?)(?=\[)/',
 			trim($output),
 			$matches
 		);
@@ -208,8 +208,8 @@ class HostsController
 			return respond($output, 201);
 		}
 	}
-
-	function addGroup()
+	
+function addGroup()
 	{
 		$groupname = trim(request('groupname'));
 

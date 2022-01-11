@@ -9,7 +9,7 @@ use Liman\Toolkit\Shell\Command;
 class RunPlaybook extends Task
 {
 	protected $description = 'Playbook çalıştırılıyor...';
-	protected $command = 'ansible-playbook /var/playbooks/{:filename} -i /etc/ansible/hosts';
+	protected $command = "ansible-playbook /var/playbooks/{:filename} -i /etc/ansible/hosts --extra-vars 'ansible_sudo_pass={:passText}'";
 	protected $sudoRequired = false;
 	protected $control = 'ansible-playbook';
 
@@ -21,7 +21,8 @@ class RunPlaybook extends Task
 
 		$this->attributes = $attributes;
 		$this->logFile = Formatter::run('/tmp/ansible-playbook-{:filename}', [
-			'filename' => $attributes['filename']
+			'filename' => $attributes['filename'],
+			'passText' => $attributes['passText']
 		]);
 	}
 

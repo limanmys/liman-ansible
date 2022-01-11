@@ -16,11 +16,10 @@ class FileController
 
 	function getContent()
 	{
-		$filePath = request('filepath');
-		$output = Command::runSudo('cat {:filePath} | base64', [
-			'filePath' => $filePath
+		$output = Command::runSudo('cat {:filePath}', [
+			'filePath' => request('filePath')
 		]);
-		return respond(base64_decode($output), 200);
+		return $output;
 	}
 
 	function upload()
@@ -105,13 +104,11 @@ class FileController
 
 	function edit()
 	{
-		$text = request('text');
-		$filePath = request('filePath');
 		Command::runSudo(
 			"bash -c \"echo @{:text} | base64 -d | tee @{:filePath}\"",
 			[
-				'text' => base64_encode($text),
-				'filePath' => $filePath
+				'text' => base64_encode(request('text')),
+				'filePath' => request('filePath')
 			]
 		);
 		return respond('Başarılı', 200);

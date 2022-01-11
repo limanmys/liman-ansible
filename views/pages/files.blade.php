@@ -23,6 +23,7 @@
 @endcomponent
 <div id="filesDiv"></div>
 
+
 <script>
     $('#test-upload-file').change(function () {
         let fileName = $("#fileUpload [name='file_upload']").val()
@@ -37,7 +38,20 @@
             })
         }
     }); 
-    
+    function getFileContent(getData){
+        showSwal('{{__("Yükleniyor...")}}','info');
+        let data = new FormData();
+        let filePath = getData.node.id;
+        data.append("filePath",filePath);
+        request("{{API('get_file_content')}}", data, function(response) {
+            $("#textDiv").val(response);
+            Swal.close();
+        }, function(error) {
+            error = JSON.parse(error)["message"];
+            showSwal(error,'error');
+        });
+    }
+
     function editFile(){
         Swal.fire({
             title: "{{ __('Onay') }}",
@@ -48,14 +62,15 @@
             cancelButtonColor: '#d33',
             cancelButtonText: "{{ __('İptal') }}",
             confirmButtonText: "{{ __('Güncelle') }}"
+            
         }).then((result) => {
             if (result.value) {
                 showSwal('{{__("Güncelleniyor..")}}','info');
                 let data = new FormData();
-                let text = $('#textDiv').val()
+                let text = $('#textDiv').val();
                 let filePath = $("#fileTree").jstree("get_selected",true)[0]["original"]["id"];
-                data.append("filePath",filePath)
-                data.append("text",text)
+                data.append("filePath",filePath);
+                data.append("text",text);
                 request(API('edit_file'), data, function(res) {
                     showSwal('{{__("Güncellendi")}}','success',2000);
                 }, function(res) {
@@ -85,7 +100,7 @@
             showSwal(error.message,'error');
         });
     }
-
+    
     function getFiles(){
         let types = {
             "directory" : {
@@ -98,7 +113,7 @@
         var form = new FormData();
         showSwal('{{__("Yükleniyor...")}}','info');
         request("{{API('get_files')}}", form, function(response) {
-            $("#filesDiv").html(response)
+            $("#filesDiv").html(response);
             Swal.close();
         }, function(error) {
             error = JSON.parse(error)["message"]
