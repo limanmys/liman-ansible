@@ -51,13 +51,14 @@ class PlaybookController
 	}
 
 	public function getOutput()
-    {
+	{
 		$output = Command::run('cat /var/playbooks/test.txt');
-		if(!empty($output))
+		if (!empty($output)) {
 			return $output;
-		else
+		} else {
 			return respond('Playbook çıktısı bulunamadı..!', 201);
-    }
+		}
+	}
 
 	public function getLog()
 	{
@@ -75,7 +76,7 @@ class PlaybookController
 					continue;
 				}
 				$itemArray = explode(' ', trim($value));
-				$nameArray = explode("-.-", trim($itemArray[4]));
+				$nameArray = explode('-.-', trim($itemArray[4]));
 				$item = [
 					'name' => $nameArray[0],
 					'size' => $itemArray[0],
@@ -93,7 +94,7 @@ class PlaybookController
 			'value' => $data,
 			'title' => ['Dosya Adı', 'Boyut', 'Kullanıcı', 'Tarih'],
 			'display' => ['name', 'size', 'user', 'date'],
-			"onclick" => "showLogContent",
+			'onclick' => 'showLogContent',
 			'menu' => [
 				'Gör' => [
 					'target' => 'showLogContent',
@@ -144,7 +145,7 @@ class PlaybookController
 			]
 		);
 
-		if  (empty(trim($result))) {
+		if (empty(trim($result))) {
 			return respond('Oluşturuldu', 200);
 		} else {
 			return respond($result, 201);
@@ -196,8 +197,8 @@ class PlaybookController
 
 	public function run()
 	{
-		Command::run("rm /var/playbooks/test.txt");
-		Command::run("touch /var/playbooks/test.txt");
+		Command::run('rm /var/playbooks/test.txt');
+		Command::run('touch /var/playbooks/test.txt');
 		Command::runSudo(
 			"sed -i 's/hosts: .*/hosts: {:group}/g' /var/playbooks/{:filename}",
 			[
@@ -241,7 +242,7 @@ class PlaybookController
 
 	public function savePlaybookTask()
 	{
-		$logFileName = request('logFileName') . "-.-" . user()->name;
+		$logFileName = request('logFileName') . '-.-' . user()->name;
 		$checkFile = Command::runSudo(
 			'[ -f /var/playbook-logs/{:logFileName} ] && echo 1 || echo 0',
 			[
@@ -270,7 +271,7 @@ class PlaybookController
 	{
 		$textArea = request('textArea');
 		$logFileContent = Command::run('cat /var/playbooks/test.txt');
-		$logFileName = request('logFileName') . "-.-" . user()->name;
+		$logFileName = request('logFileName') . '-.-' . user()->name;
 		$checkFile = Command::runSudo(
 			'[ -f /var/playbook-logs/{:logFileName} ] && echo 1 || echo 0',
 			[
@@ -286,7 +287,7 @@ class PlaybookController
 		if (((bool) !$checkDirectory)) {
 			Command::runSudo('mkdir /var/playbook-logs');
 		}
-		if(!empty($textArea)){
+		if (!empty($textArea)) {
 			Command::runSudo(
 				"bash -c \"echo @{:logFileContent} | base64 -d | tee /var/playbook-logs/{:logFileName}\"",
 				[
@@ -295,9 +296,8 @@ class PlaybookController
 				]
 			);
 			return respond('Kaydedildi', 200);
-		}
-		else
+		} else {
 			return respond('Kayıt başarısız!.. (Boş veri)', 201);
+		}
 	}
-	
 }

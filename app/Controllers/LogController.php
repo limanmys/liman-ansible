@@ -23,7 +23,7 @@ class LogController
 					continue;
 				}
 				$itemArray = explode(' ', trim($value));
-				$nameArray = explode("-.-", trim($itemArray[4]));
+				$nameArray = explode('-.-', trim($itemArray[4]));
 				$item = [
 					'name' => $nameArray[0],
 					'size' => $itemArray[0],
@@ -41,7 +41,7 @@ class LogController
 			'value' => $data,
 			'title' => ['Dosya Adı', 'Boyut', 'Kullanıcı', 'Tarih'],
 			'display' => ['name', 'size', 'user', 'date'],
-			"onclick" => "logContent",
+			'onclick' => 'logContent',
 			'menu' => [
 				'Gör' => [
 					'target' => 'logContent',

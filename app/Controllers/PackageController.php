@@ -31,7 +31,7 @@ class PackageController
 				'onSuccess' => 'onTaskSuccess',
 				'tasks' => [
 					0 => [
-						'name' => 'InstallPackage',					
+						'name' => 'InstallPackage',
 						'attributes' => []
 					]
 				]
