@@ -15,7 +15,6 @@ return [
     "add_ssh_key_request" => "HostsController@addSshKeyRequest",
     "remove_ssh_key" => "HostsController@removeShhKey",
     "delete_group" => "HostsController@deleteGroup",
-    "test_api" => "HostsController@test",
 
     "get_files" => "FileController@get",
     "get_file_content" => "FileController@getContent",
