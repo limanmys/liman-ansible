@@ -76,7 +76,7 @@
         "inputs" => [
             "Grup:group" => \App\Controllers\PlaybookController::getHostsSelect(),
             "filename:filename" => "filename:hidden",
-            "Sudo Şifresi" => "passText:text:Sudo Şifresi giriniz",
+            "Sudo Şifresi" => "passText:password:Sudo Şifresi giriniz",
         ]
     ])
 @endcomponent
