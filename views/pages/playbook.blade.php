@@ -1,5 +1,5 @@
 <button  class="btn btn-primary mb-2" onclick="openPlaybookComponent()">
-    <i class="fas fa-plus"></i> {{ __('Dosya Oluştur') }}
+    <i class="fas fa-plus"></i> {{ __('Playbook Oluştur') }}
 </button>
 
 <div class="row">
