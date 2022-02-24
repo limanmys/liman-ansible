@@ -118,7 +118,7 @@ class PlaybookController
 
 	public function getContent()
 	{
-		$fileName = preg_replace("/\r|\n/", "", request('fileName'));
+		$fileName = preg_replace("/\r|\n/", '', request('fileName'));
 		$output = Command::runSudo('cat /var/playbooks/{:fileName} | base64', [
 			'fileName' => $fileName
 		]);
@@ -159,7 +159,7 @@ class PlaybookController
 			"sh -c \"echo @{:contentFile}| base64 -d | tee /var/playbooks/{:fileName}\"  1>/dev/null",
 			[
 				'contentFile' => base64_encode(request('contentFile')),
-				'fileName' => preg_replace("/\r|\n/", "", request('fileName'))
+				'fileName' => preg_replace("/\r|\n/", '', request('fileName'))
 			]
 		);
 
@@ -173,7 +173,7 @@ class PlaybookController
 	public function delete()
 	{
 		$result = Command::runSudo('rm -rf /var/playbooks/{:fileName}', [
-			'fileName' => preg_replace("/\r|\n/", "", request('fileName'))
+			'fileName' => preg_replace("/\r|\n/", '', request('fileName'))
 		]);
 
 		if (empty(trim($result))) {
@@ -198,7 +198,7 @@ class PlaybookController
 
 	public function run()
 	{
-		$fileName = preg_replace("/\r|\n/", "", request('filename'));
+		$fileName = preg_replace("/\r|\n/", '', request('filename'));
 
 		Command::run('rm /var/playbooks/test.txt');
 		Command::run('touch /var/playbooks/test.txt');
@@ -209,7 +209,7 @@ class PlaybookController
 				'group' => request('group')
 			]
 		);
-		
+
 		return respond(
 			view('task', [
 				'onFail' => 'onTaskFail',
@@ -294,7 +294,9 @@ class PlaybookController
 			Command::runSudo(
 				"bash -c \"echo @{:logFileContent} | base64 -d | tee /var/playbook-logs/{:logFileName}\"",
 				[
-					'logFileContent' => base64_encode(str_replace("\r\n","\n",$textArea)),
+					'logFileContent' => base64_encode(
+						str_replace("\r\n", "\n", $textArea)
+					),
 					'logFileName' => $logFileName
 				]
 			);
