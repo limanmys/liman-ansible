@@ -4,6 +4,9 @@
 
 <div class="row">
     <div class="col-sm-6">
+        <br>
+        <h4>Playbook'lar</h4>
+        <hr>
         <div id="playbookTable"></div>
     </div>
     <div class="col-sm-6">
@@ -13,6 +16,9 @@
                 <i class="fas fa-edit" ></i> {{ __('Kaydet') }}
             </button>
         </div>
+        <br>
+        <h4>Log'lar</h4>
+        <hr>
         <div id="playbookLogTable" style="width:100%;"></div>
     </select>
     </div>
