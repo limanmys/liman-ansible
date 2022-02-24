@@ -7,7 +7,7 @@ use Liman\Toolkit\Shell\Command;
 
 class HostsController
 {
-	protected $hostsFilePath = '/etc/ansible/hosts';
+	protected $hostsFilePath = '/etc/ansible/hosts2';
 
 	function deleteGroup()
 	{

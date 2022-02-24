@@ -51,7 +51,7 @@ class TemplateController
 	public function getContent()
 	{
 		$output = Command::runSudo('cat  /var/templates/{:fileName} | base64', [
-			'fileName' => request('fileName')
+			'fileName' => preg_replace("/\r|\n/", "", request('fileName')) 
 		]);
 
 		return respond(base64_decode($output), 200);
@@ -59,8 +59,8 @@ class TemplateController
 
 	public function create()
 	{
-		$fileName = request('fileName');
-		$fileContent = request('fileContent');
+		$fileName = preg_replace("/\r|\n/", "", request('fileName'));
+		$fileContent = str_replace("\r\n","\n",request('fileContent'));
 
 		if (!preg_match('/^[a-z0-9-.]+$/', $fileName)) {
 			return respond(
@@ -100,8 +100,8 @@ class TemplateController
 		$result = Command::runSudo(
 			"sh -c \"echo @{:contentFile}| base64 -d | tee /var/templates/{:fileName}\"  1>/dev/null",
 			[
-				'contentFile' => base64_encode(request('contentFile')),
-				'fileName' => request('fileName')
+				'contentFile' => base64_encode(str_replace("\r\n","\n",request('contentFile'))),
+				'fileName' => preg_replace("/\r|\n/", "", request('fileName'))
 			]
 		);
 

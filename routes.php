@@ -24,7 +24,7 @@ return [
     "install_package" => "PackageController@install",
 
     "get_playbooks" => "PlaybookController@get",
-    "get_content_playbook" => "PlaybookController@getContent",
+    "get_content_playbook" => "PlaybookController@GetContent",
     "get_log" => "PlaybookController@getLog",
     "get_content_log" => "PlaybookController@getContentLog",
     "edit_playbook" => "PlaybookController@edit",

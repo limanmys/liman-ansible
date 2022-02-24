@@ -118,8 +118,9 @@ class PlaybookController
 
 	public function getContent()
 	{
+		$fileName = preg_replace("/\r|\n/", "", request('fileName'));
 		$output = Command::runSudo('cat /var/playbooks/{:fileName} | base64', [
-			'fileName' => request('fileName')
+			'fileName' => $fileName
 		]);
 		return respond(base64_decode($output), 200);
 	}
@@ -158,7 +159,7 @@ class PlaybookController
 			"sh -c \"echo @{:contentFile}| base64 -d | tee /var/playbooks/{:fileName}\"  1>/dev/null",
 			[
 				'contentFile' => base64_encode(request('contentFile')),
-				'fileName' => request('fileName')
+				'fileName' => preg_replace("/\r|\n/", "", request('fileName'))
 			]
 		);
 
@@ -172,7 +173,7 @@ class PlaybookController
 	public function delete()
 	{
 		$result = Command::runSudo('rm -rf /var/playbooks/{:fileName}', [
-			'fileName' => request('fileName')
+			'fileName' => preg_replace("/\r|\n/", "", request('fileName'))
 		]);
 
 		if (empty(trim($result))) {
@@ -197,16 +198,18 @@ class PlaybookController
 
 	public function run()
 	{
+		$fileName = preg_replace("/\r|\n/", "", request('filename'));
+
 		Command::run('rm /var/playbooks/test.txt');
 		Command::run('touch /var/playbooks/test.txt');
 		Command::runSudo(
 			"sed -i 's/hosts: .*/hosts: {:group}/g' /var/playbooks/{:filename}",
 			[
-				'filename' => request('filename'),
+				'filename' => $fileName,
 				'group' => request('group')
 			]
 		);
-
+		
 		return respond(
 			view('task', [
 				'onFail' => 'onTaskFail',
@@ -214,7 +217,7 @@ class PlaybookController
 					0 => [
 						'name' => 'RunPlaybook',
 						'attributes' => [
-							'filename' => request('filename'),
+							'filename' => $fileName,
 							'group' => request('group'),
 							'passText' => request('passText')
 						]
@@ -227,7 +230,7 @@ class PlaybookController
 
 	public static function getHostsSelect()
 	{
-		$hostsfilepath = '/etc/ansible/hosts';
+		$hostsfilepath = '/etc/ansible/hosts2';
 		$output = Command::runSudo("cat {:hostsfilepath} | grep -v '^#'", [
 			'hostsfilepath' => $hostsfilepath
 		]);
@@ -291,7 +294,7 @@ class PlaybookController
 			Command::runSudo(
 				"bash -c \"echo @{:logFileContent} | base64 -d | tee /var/playbook-logs/{:logFileName}\"",
 				[
-					'logFileContent' => base64_encode($logFileContent),
+					'logFileContent' => base64_encode(str_replace("\r\n","\n",$textArea)),
 					'logFileName' => $logFileName
 				]
 			);

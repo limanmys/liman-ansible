@@ -9,7 +9,7 @@ use Liman\Toolkit\Shell\Command;
 class RunPlaybook extends Task
 {
 	protected $description = 'Playbook çalıştırılıyor...';
-	protected $command = "ansible-playbook /var/playbooks/{:filename} -i /etc/ansible/hosts --extra-vars 'ansible_sudo_pass={:passText}'";
+	protected $command = "ansible-playbook /var/playbooks/{:filename} -i /etc/ansible/hosts2 --extra-vars 'ansible_sudo_pass={:passText}'";
 	protected $sudoRequired = false;
 	protected $control = 'ansible-playbook';
 

@@ -68,26 +68,13 @@ class FileController
 				]
 			);
 		} elseif ($path_parts['extension'] == 'zip') {
-			$checkPackage = Command::runSudo(
-				"apt list --installed 2>/dev/null | grep 'unzip' 1>/dev/null 2>/dev/null && echo 1 || echo 0 "
+			Command::runSudo(
+				'unzip {:remotePath} -d /opt/varlik/{:dirName}',
+				[
+					'dirName' => $dirName,
+					'remotePath' => $remotePath
+				]
 			);
-			if ($checkPackage == '0') {
-				Command::runSudo('rm -rf /opt/varlik/{:dirName}', [
-					'dirName' => $dirName
-				]);
-				return respond(
-					'Bu dosya türü için unzip kurulu olmalıdır',
-					201
-				);
-			} else {
-				Command::runSudo(
-					'unzip {:remotePath} -d /opt/varlik/{:dirName}',
-					[
-						'dirName' => $dirName,
-						'remotePath' => $remotePath
-					]
-				);
-			}
 		} else {
 			return respond('Desteklenmeyen dosya tipi.', 201);
 		}
@@ -104,10 +91,11 @@ class FileController
 
 	function edit()
 	{
+		$text = str_replace("\r\n", "\n", request('text'));
 		Command::runSudo(
-			"bash -c \"echo @{:text} | base64 -d | tee @{:filePath}\"",
+			"bash -c \"echo -e @{:text} | base64 -d | tee @{:filePath}\"",
 			[
-				'text' => base64_encode(request('text')),
+				'text' => base64_encode($text),
 				'filePath' => request('filePath')
 			]
 		);
