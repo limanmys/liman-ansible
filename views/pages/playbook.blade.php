@@ -103,7 +103,7 @@
             showSwal(error, 'error');
         });
 
-        $('#playbookTaskModal').on('hidden.bs.modal',  () => {
+        /*$('#playbookTaskModal').on('hidden.bs.modal',  () => {
             showSwal('{{__("Yükleniyor...")}}','info');
             let data = new FormData();
             request(API("get_output"), data, function(response) {
@@ -114,11 +114,11 @@
                 let error = JSON.parse(response);
                 showSwal(error.message, 'error', 3000);
             }); 
-        })
+        })*/
     }
 
     function getPlaybooks(){
-        $('#outputText').val('');
+        //$('#outputText').val('');
         let form = new FormData();
         showSwal('{{__("Yükleniyor...")}}','info');
         request(API('get_playbooks'), form, function(response) {
