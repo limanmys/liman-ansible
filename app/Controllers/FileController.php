@@ -68,13 +68,10 @@ class FileController
 				]
 			);
 		} elseif ($path_parts['extension'] == 'zip') {
-			Command::runSudo(
-				'unzip {:remotePath} -d /opt/varlik/{:dirName}',
-				[
-					'dirName' => $dirName,
-					'remotePath' => $remotePath
-				]
-			);
+			Command::runSudo('unzip {:remotePath} -d /opt/varlik/{:dirName}', [
+				'dirName' => $dirName,
+				'remotePath' => $remotePath
+			]);
 		} else {
 			return respond('Desteklenmeyen dosya tipi.', 201);
 		}
