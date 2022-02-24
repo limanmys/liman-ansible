@@ -1,14 +1,11 @@
 <button  class="btn btn-primary mb-2" onclick="openPlaybookComponent()">
     <i class="fas fa-plus"></i> {{ __('Playbook Oluştur') }}
 </button>
-
-<div class="row">
-    <div class="col-sm-6">
-        <br>
-        <h4>Playbook'lar</h4>
-        <hr>
-        <div id="playbookTable"></div>
-    </div>
+    <br><br>
+    <h4>Playbook'lar</h4>
+    <hr>
+    <div id="playbookTable"></div>
+    <!--
     <div class="col-sm-6">
         <div class="col" id="outputTextArea">
             <textarea style="width:100%;height:100%;min-height:185px;" id="outputText"></textarea>
@@ -16,13 +13,11 @@
                 <i class="fas fa-edit" ></i> {{ __('Kaydet') }}
             </button>
         </div>
-        <br>
         <h4>Log'lar</h4>
         <hr>
-        <div id="playbookLogTable" style="width:100%;"></div>
-    </select>
+        <div id="playbookLogTable" style="width:100%;"></div
     </div>
-</div>
+    -->
 
 @component('modal-component',[
     "id" => "createPlaybookComponent",
@@ -133,7 +128,7 @@
             error = JSON.parse(error)["message"]
             showSwal(error,'error');
         });
-        
+        /*
         let data = new FormData();
         showSwal('{{__("Yükleniyor...")}}','info');
         request(API('get_log'), data, function(response) {
@@ -142,7 +137,7 @@
         }, function(error) {
             error = JSON.parse(error)["message"]
             showSwal(error,'error');
-        });
+        });*/
     }
 
     function dataTableCustomTablePreset(){
@@ -187,8 +182,10 @@
                     formData.append("logFileName", result.value);
                     formData.append("logFileContent", logContent);
                     request(API("playbook_save_task") ,formData,function(response){
-                        $('#playbookTaskModal').modal('hide');
                         showSwal('{{__("Kaydedildi")}}', 'success',2000);
+                        setTimeout(function(){
+                            $('#playbookTaskModal').modal('hide');
+                        }, 1500);
                     }, function(response){
                         let error = JSON.parse(response);
                         showSwal(error.message, 'error');
