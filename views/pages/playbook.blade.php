@@ -176,7 +176,7 @@
             showCancelButton: true,
             confirmButtonText: 'Kaydet',
             }).then((result) => {
-                if (result.value) {
+                if (result.value.indexOf(' ') < 0) {
                     let formData = new FormData();
                     let logContent = $("#playbookTaskModal").find('#outputArea').text();
                     formData.append("logFileName", result.value);
@@ -190,6 +190,9 @@
                         let error = JSON.parse(response);
                         showSwal(error.message, 'error');
                     }); 
+                }
+                else {
+                    showSwal('{{__("Dosya adı boşluk içermemelidir!")}}', 'error', 2000);
                 }
         });
         $('#playbookTaskModal').on('hidden.bs.modal',  () => {

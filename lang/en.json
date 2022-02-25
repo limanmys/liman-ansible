@@ -149,5 +149,6 @@
 	"Lisansınız bu eklenti için geçerli değil!": "Your license is not valid for this extension!",
 	"Lisansınız bu makine için geçerli değil!": "Your license is not valid for this machine!",
 	"Lisansınızın süresi doldu!": "Your license has expired!",
-	"Mevcut lisansınız ile bu özelliği kullanamazsınız!": "You cannot use this feature with your current license!"
+	"Mevcut lisansınız ile bu özelliği kullanamazsınız!": "You cannot use this feature with your current license!",
+	"Dosya adı boşluk içermemelidir!": "The filename must not contain spaces!"
 }
