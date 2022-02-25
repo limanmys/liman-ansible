@@ -21,7 +21,7 @@
 
 @component('modal-component',[
     "id" => "createPlaybookComponent",
-    "title" => "Dosya Oluştur",
+    "title" => "Playbook Oluştur",
     "footer" => [
         "text" => "Oluştur",
         "class" => "btn-primary",

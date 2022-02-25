@@ -1,8 +1,17 @@
 {
     "name": "Ansible",
     "publisher": "Administrator",
-    "version": "0.37",
-    "database": [],
+    "version": "0.38",
+    "database": [
+        {
+            "variable": "playbookPath",
+            "type": "text",
+            "name": "Playbook Dizini",
+            "required": true,
+            "global": false,
+            "writable": false
+        }
+    ],
     "widgets": [],
     "views": [
         {
@@ -20,5 +29,5 @@
     "verification": null,
     "dependencies": "php7.3-yaml",
     "sslPorts": null,
-    "version_code": 18
+    "version_code": 19
 }

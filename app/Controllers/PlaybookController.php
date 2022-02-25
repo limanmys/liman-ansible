@@ -8,16 +8,19 @@ class PlaybookController
 {
 	public function get()
 	{
-		$checkDirectory = Command::runSudo(
-			'[ -d /var/playbooks ] && echo 1 || echo 0'
-		);
+		$playbookPath = extensionDB('playbookPath');
+		$checkDirectory = Command::runSudo('[ -d {:playbookPath} ] && echo 1 || echo 0',[
+			'playbookPath' => $playbookPath
+		]);
 		if ($checkDirectory == '0') {
-			Command::runSudo('mkdir /var/playbooks');
+			Command::runSudo('mkdir {:playbookPath}',[
+				'playbookPath' => $playbookPath
+			]);
 		}
 		$fileJson = [];
-		$fileList = Command::runSudo(
-			"ls -l /var/playbooks | awk '{{print $9}}'"
-		);
+		$fileList = Command::runSudo("ls -l {:playbookPath} | awk '{{print $9}}'",[
+			'playbookPath' => $playbookPath
+		]);
 		if (empty($output)) {
 			$fileArray = explode("\n", $fileList);
 			$fileJson = collect($fileArray)->map(function ($i) {
@@ -52,7 +55,9 @@ class PlaybookController
 
 	public function getOutput()
 	{
-		$output = Command::run('cat /var/playbooks/test.txt');
+		$output = Command::run('cat {:playbookPath}/test.txt',[
+			'playbookPath' => extensionDB('playbookPath')
+		]);
 		if (!empty($output)) {
 			return $output;
 		} else {
@@ -119,7 +124,8 @@ class PlaybookController
 	public function getContent()
 	{
 		$fileName = preg_replace("/\r|\n/", '', request('fileName'));
-		$output = Command::runSudo('cat /var/playbooks/{:fileName} | base64', [
+		$output = Command::runSudo('cat {:playbookPath}/{:fileName} | base64', [
+			'playbookPath' => extensionDB('playbookPath'),
 			'fileName' => $fileName
 		]);
 		return respond(base64_decode($output), 200);
@@ -128,8 +134,9 @@ class PlaybookController
 	public function create()
 	{
 		$checkFile = Command::runSudo(
-			'[ -f /var/playbooks/{:fileName} ] && echo 1 || echo 0',
+			'[ -f {:playbookPath}/{:fileName} ] && echo 1 || echo 0',
 			[
+				'playbookPath' => extensionDB('playbookPath'),
 				'fileName' => request('fileName')
 			]
 		);
@@ -139,8 +146,9 @@ class PlaybookController
 		}
 
 		$result = Command::runSudo(
-			"sh -c \"echo @{:fileContent}| base64 -d | tee /var/playbooks/{:fileName}\"  1>/dev/null",
+			"sh -c \"echo @{:fileContent}| base64 -d | tee {:playbookPath}/{:fileName}\"  1>/dev/null",
 			[
+				'playbookPath' => extensionDB('playbookPath'),
 				'fileContent' => base64_encode(request('fileContent')),
 				'fileName' => request('fileName')
 			]
@@ -156,8 +164,9 @@ class PlaybookController
 	public function edit()
 	{
 		$result = Command::runSudo(
-			"sh -c \"echo @{:contentFile}| base64 -d | tee /var/playbooks/{:fileName}\"  1>/dev/null",
+			"sh -c \"echo @{:contentFile}| base64 -d | tee {:playbookPath}/{:fileName}\"  1>/dev/null",
 			[
+				'playbookPath' => extensionDB('playbookPath'),
 				'contentFile' => base64_encode(request('contentFile')),
 				'fileName' => preg_replace("/\r|\n/", '', request('fileName'))
 			]
@@ -172,7 +181,8 @@ class PlaybookController
 
 	public function delete()
 	{
-		$result = Command::runSudo('rm -rf /var/playbooks/{:fileName}', [
+		$result = Command::runSudo('rm -rf {:playbookPath}/{:fileName}', [
+			'playbookPath' => extensionDB('playbookPath'),
 			'fileName' => preg_replace("/\r|\n/", '', request('fileName'))
 		]);
 
@@ -198,13 +208,19 @@ class PlaybookController
 
 	public function run()
 	{
+		$playbookPath = extensionDB('playbookPath');
 		$fileName = preg_replace("/\r|\n/", '', request('filename'));
 
-		Command::run('rm /var/playbooks/test.txt');
-		Command::run('touch /var/playbooks/test.txt');
+		Command::run('rm {:playbookPath}/test.txt',[
+			'playbookPath' => $playbookPath
+		]);
+		Command::run('touch {:playbookPath}/test.txt',[
+			'playbookPath' => $playbookPath
+		]);
 		Command::runSudo(
-			"sed -i 's/hosts: .*/hosts: {:group}/g' /var/playbooks/{:filename}",
+			"sed -i 's/hosts: .*/hosts: {:group}/g' {:playbookPath}/{:filename}",
 			[
+				'playbookPath' => $playbookPath,
 				'filename' => $fileName,
 				'group' => request('group')
 			]
@@ -217,6 +233,7 @@ class PlaybookController
 					0 => [
 						'name' => 'RunPlaybook',
 						'attributes' => [
+							'playbookPath' => $playbookPath,
 							'filename' => $fileName,
 							'group' => request('group'),
 							'passText' => request('passText')
@@ -273,7 +290,9 @@ class PlaybookController
 	public function savePlaybookOutput()
 	{
 		$textArea = request('textArea');
-		$logFileContent = Command::run('cat /var/playbooks/test.txt');
+		$logFileContent = Command::run('cat {:playbookPath}/test.txt',[
+			'playbookPath' => extensionDB('playbookPath')
+		]);
 		$logFileName = request('logFileName') . '-.-' . user()->name;
 		$checkFile = Command::runSudo(
 			'[ -f /var/playbook-logs/{:logFileName} ] && echo 1 || echo 0',
