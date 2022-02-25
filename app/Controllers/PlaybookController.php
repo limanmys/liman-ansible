@@ -9,18 +9,24 @@ class PlaybookController
 	public function get()
 	{
 		$playbookPath = extensionDB('playbookPath');
-		$checkDirectory = Command::runSudo('[ -d {:playbookPath} ] && echo 1 || echo 0',[
-			'playbookPath' => $playbookPath
-		]);
+		$checkDirectory = Command::runSudo(
+			'[ -d {:playbookPath} ] && echo 1 || echo 0',
+			[
+				'playbookPath' => $playbookPath
+			]
+		);
 		if ($checkDirectory == '0') {
-			Command::runSudo('mkdir {:playbookPath}',[
+			Command::runSudo('mkdir {:playbookPath}', [
 				'playbookPath' => $playbookPath
 			]);
 		}
 		$fileJson = [];
-		$fileList = Command::runSudo("ls -l {:playbookPath} | awk '{{print $9}}'",[
-			'playbookPath' => $playbookPath
-		]);
+		$fileList = Command::runSudo(
+			"ls -l {:playbookPath} | awk '{{print $9}}'",
+			[
+				'playbookPath' => $playbookPath
+			]
+		);
 		if (empty($output)) {
 			$fileArray = explode("\n", $fileList);
 			$fileJson = collect($fileArray)->map(function ($i) {
@@ -55,7 +61,7 @@ class PlaybookController
 
 	public function getOutput()
 	{
-		$output = Command::run('cat {:playbookPath}/test.txt',[
+		$output = Command::run('cat {:playbookPath}/test.txt', [
 			'playbookPath' => extensionDB('playbookPath')
 		]);
 		if (!empty($output)) {
@@ -211,10 +217,10 @@ class PlaybookController
 		$playbookPath = extensionDB('playbookPath');
 		$fileName = preg_replace("/\r|\n/", '', request('filename'));
 
-		Command::run('rm {:playbookPath}/test.txt',[
+		Command::run('rm {:playbookPath}/test.txt', [
 			'playbookPath' => $playbookPath
 		]);
-		Command::run('touch {:playbookPath}/test.txt',[
+		Command::run('touch {:playbookPath}/test.txt', [
 			'playbookPath' => $playbookPath
 		]);
 		Command::runSudo(
@@ -290,7 +296,7 @@ class PlaybookController
 	public function savePlaybookOutput()
 	{
 		$textArea = request('textArea');
-		$logFileContent = Command::run('cat {:playbookPath}/test.txt',[
+		$logFileContent = Command::run('cat {:playbookPath}/test.txt', [
 			'playbookPath' => extensionDB('playbookPath')
 		]);
 		$logFileName = request('logFileName') . '-.-' . user()->name;
